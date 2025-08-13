@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>厨具宣传海报 · 三步生成&发布 Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .step-active{border-color:#111827;box-shadow:0 0 0 4px rgb(17 24 39 / 0.1)}
+    canvas{image-rendering:crisp-edges;image-rendering:-webkit-optimize-contrast}
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <div class="max-w-6xl mx-auto p-4 md:p-8">
+    <header class="mb-6 md:mb-8">
+      <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight">厨具宣传海报 · 三步生成&发布</h1>
+      <p class="text-slate-600 mt-2">1) 上传素材 → 2) 生成海报 → 3) 美化并导出为链接（用于发布到 GitHub Pages 等静态托管）。全部在浏览器本地完成，无需服务器。</p>
+    </header>
+
+    <!-- Steps Nav -->
+    <nav class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+      <button id="tab1" class="rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-left hover:border-slate-400 transition">1. 素材上传</button>
+      <button id="tab2" class="rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-left hover:border-slate-400 transition">2. 海报生成</button>
+      <button id="tab3" class="rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-left hover:border-slate-400 transition">3. 美化 & 发布</button>
+    </nav>
+
+    <!-- Step 1 -->
+    <section id="step1" class="rounded-3xl border border-slate-200 bg-white p-4 md:p-6 shadow-sm">
+      <h2 class="text-xl md:text-2xl font-bold mb-4">步骤一：素材上传</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <label class="block font-semibold mb-2">上传厨具产品图</label>
+          <input id="imgProduct" type="file" accept="image/*" class="file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-slate-800 file:text-white hover:file:bg-black w-full" />
+          <div class="mt-3 aspect-video rounded-2xl bg-slate-100 grid place-content-center overflow-hidden">
+            <img id="previewProduct" class="max-h-full max-w-full object-contain" alt="产品图预览" />
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold mb-2">上传烹饪结果/场景图</label>
+          <input id="imgResult" type="file" accept="image/*" class="file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-slate-800 file:text-white hover:file:bg-black w-full" />
+          <div class="mt-3 aspect-video rounded-2xl bg-slate-100 grid place-content-center overflow-hidden">
+            <img id="previewResult" class="max-h-full max-w-full object-contain" alt="结果图预览" />
+          </div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-4 mt-6">
+        <div>
+          <label class="block font-semibold mb-2">品牌名</label>
+          <input id="brand" type="text" placeholder="示例：ChefPro" class="w-full rounded-xl border border-slate-300 px-4 py-2" />
+        </div>
+        <div>
+          <label class="block font-semibold mb-2">产品名</label>
+          <input id="productName" type="text" placeholder="示例：不粘煎锅 28cm" class="w-full rounded-xl border border-slate-300 px-4 py-2" />
+        </div>
+        <div>
+          <label class="block font-semibold mb-2">主打价（￥）</label>
+          <input id="price" type="text" placeholder="示例：199" class="w-full rounded-xl border border-slate-300 px-4 py-2" />
+        </div>
+      </div>
+      <div class="mt-4">
+        <label class="block font-semibold mb-2">能力/卖点（每行一条）</label>
+        <textarea id="bullets" rows="4" placeholder="快速均匀导热\n食品级涂层不粘易洗\n兼容燃气/电磁炉\n加厚锅底耐用不变形" class="w-full rounded-xl border border-slate-300 px-4 py-3"></textarea>
+      </div>
+      <div class="mt-6 flex items-center gap-3">
+        <button id="go2" class="rounded-2xl bg-slate-900 text-white px-5 py-3 shadow hover:bg-black">下一步：生成海报</button>
+        <span class="text-slate-500">（完成素材与文案后进入第二步）</span>
+      </div>
+    </section>
+
+    <!-- Step 2 -->
+    <section id="step2" class="hidden rounded-3xl border border-slate-200 bg-white p-4 md:p-6 shadow-sm">
+      <h2 class="text-xl md:text-2xl font-bold mb-4">步骤二：海报生成</h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div>
+          <label class="block font-semibold mb-2">主题色</label>
+          <input id="primaryColor" type="color" value="#0ea5e9" class="w-full h-12 rounded-xl border border-slate-300" />
+        </div>
+        <div>
+          <label class="block font-semibold mb-2">副色</label>
+          <input id="secondaryColor" type="color" value="#111827" class="w-full h-12 rounded-xl border border-slate-300" />
+        </div>
+        <div>
+          <label class="block font-semibold mb-2">背景风格</label>
+          <select id="bgStyle" class="w-full rounded-xl border border-slate-300 px-3 py-2">
+            <option value="gradient">渐变</option>
+            <option value="solid">纯色</option>
+            <option value="paper">质感纸</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-4 grid md:grid-cols-3 gap-4">
+        <div>
+          <label class="block font-semibold mb-2">海报尺寸</label>
+          <select id="posterSize" class="w-full rounded-xl border border-slate-300 px-3 py-2">
+            <option value="1080x1350">1080×1350（社媒竖版）</option>
+            <option value="1080x1920">1080×1920（故事/竖屏）</option>
+            <option value="1200x628">1200×628（横版广告）</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-2">角标/促销文案</label>
+          <input id="promo" type="text" placeholder="今日直降 / 新品上市 / 买一送一" class="w-full rounded-xl border border-slate-300 px-4 py-2" />
+        </div>
+        <div>
+          <label class="block font-semibold mb-2">行动号召 CTA</label>
+          <input id="cta" type="text" placeholder="立即下单 · 限时包邮" class="w-full rounded-xl border border-slate-300 px-4 py-2" />
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center gap-3">
+        <button id="btnRender" class="rounded-2xl bg-slate-900 text-white px-5 py-3 shadow hover:bg-black">生成海报预览</button>
+        <button id="go3" class="rounded-2xl bg-slate-100 text-slate-800 px-5 py-3 border border-slate-300 hover:bg-slate-200">下一步：美化&发布</button>
+      </div>
+
+      <div class="mt-6 grid md:grid-cols-2 gap-6 items-start">
+        <div>
+          <canvas id="canvas" class="w-full rounded-2xl border border-slate-200 shadow"></canvas>
+        </div>
+        <div class="text-sm text-slate-600">
+          <p class="mb-3 font-semibold">提示</p>
+          <ul class="list-disc ml-5 space-y-2">
+            <li>图片将自动等比缩放并加上柔和投影；</li>
+            <li>卖点以圆点符号展示，最多 8 条为宜；</li>
+            <li>可选背景有渐变、纯色与纸张纹理；</li>
+            <li>如需高分辨率导出，请选择较大尺寸并使用 PNG 下载。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 3 -->
+    <section id="step3" class="hidden rounded-3xl border border-slate-200 bg-white p-4 md:p-6 shadow-sm">
+      <h2 class="text-xl md:text-2xl font-bold mb-4">步骤三：美化 & 发布</h2>
+
+      <div class="grid md:grid-cols-3 gap-4">
+        <div>
+          <label class="block font-semibold mb-2">美化主题</label>
+          <select id="theme" class="w-full rounded-xl border border-slate-300 px-3 py-2">
+            <option value="clean">简洁 Clean</option>
+            <option value="bold">醒目 Bold</option>
+            <option value="elegant">优雅 Elegant</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-2">阴影强度</label>
+          <input id="shadow" type="range" min="0" max="20" value="8" class="w-full" />
+        </div>
+        <div>
+          <label class="block font-semibold mb-2">圆角程度</label>
+          <input id="radius" type="range" min="0" max="40" value="24" class="w-full" />
+        </div>
+      </div>
+
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <button id="btnBeautify" class="rounded-2xl bg-slate-900 text-white px-5 py-3 shadow hover:bg-black">应用美化到海报</button>
+        <button id="btnDownload" class="rounded-2xl bg-emerald-600 text-white px-5 py-3 shadow hover:bg-emerald-700">下载 PNG 海报</button>
+        <button id="btnShareHtml" class="rounded-2xl bg-indigo-600 text-white px-5 py-3 shadow hover:bg-indigo-700">导出「可分享HTML页面」</button>
+      </div>
+
+      <p class="text-slate-600 text-sm mt-4">发布方法：将导出的 <code>poster.html</code> 或 <code>poster.png</code> 上传到你的 GitHub Pages 仓库，即可得到公开链接。例如 <code>https://你的用户名.github.io/你的仓库/poster.html</code>。</p>
+    </section>
+
+    <footer class="mt-10 text-center text-slate-500 text-sm">© Demo — 本示例仅作展示用，所有处理均在本地浏览器完成。</footer>
+  </div>
+
+  <script>
+    const el = (id)=>document.getElementById(id);
+    const tab1 = el('tab1'), tab2 = el('tab2'), tab3 = el('tab3');
+    const step1 = el('step1'), step2 = el('step2'), step3 = el('step3');
+    function activate(n){
+      [tab1,tab2,tab3].forEach(t=>t.classList.remove('step-active'));
+      [step1,step2,step3].forEach(s=>s.classList.add('hidden'));
+      if(n===1){tab1.classList.add('step-active');step1.classList.remove('hidden');}
+      if(n===2){tab2.classList.add('step-active');step2.classList.remove('hidden');}
+      if(n===3){tab3.classList.add('step-active');step3.classList.remove('hidden');}
+    }
+    activate(1);
+    tab1.onclick=()=>activate(1); tab2.onclick=()=>activate(2); tab3.onclick=()=>activate(3);
+    el('go2').onclick=()=>activate(2); el('go3').onclick=()=>activate(3);
+
+    let productImg=null, resultImg=null;
+    const previewImage=(input, imgEl, cb)=>{
+      input.addEventListener('change', async ()=>{
+        const f = input.files?.[0]; if(!f) return;
+        const url = URL.createObjectURL(f);
+        imgEl.src = url;
+        const img = new Image();
+        img.onload = ()=>{ cb(img); };
+        img.src = url;
+      });
+    };
+    previewImage(el('imgProduct'), el('previewProduct'), (img)=>{productImg=img;});
+    previewImage(el('imgResult'), el('previewResult'), (img)=>{resultImg=img;});
+
+    // Canvas & rendering
+    const canvas = el('canvas');
+    const ctx = canvas.getContext('2d');
+
+    function parseSize(v){
+      const [w,h] = v.split('x').map(Number); return {w,h};
+    }
+
+    function roundRect(ctx, x, y, w, h, r){
+      const rr = Math.min(r, w/2, h/2);
+      ctx.beginPath();
+      ctx.moveTo(x+rr, y);
+      ctx.arcTo(x+w, y, x+w, y+h, rr);
+      ctx.arcTo(x+w, y+h, x, y+h, rr);
+      ctx.arcTo(x, y+h, x, y, rr);
+      ctx.arcTo(x, y, x+w, y, rr);
+      ctx.closePath();
+    }
+
+    function drawBg(style, pColor, sColor, w, h){
+      if(style==='solid'){
+        ctx.fillStyle = pColor;
+        ctx.fillRect(0,0,w,h);
+      } else if(style==='paper'){
+        ctx.fillStyle = pColor;
+        ctx.fillRect(0,0,w,h);
+        // add subtle noise texture
+        const noise = ctx.createImageData(64,64);
+        for(let i=0;i<noise.data.length;i+=4){
+          const v = 235+Math.floor(Math.random()*20);
+          noise.data[i]=v; noise.data[i+1]=v; noise.data[i+2]=v; noise.data[i+3]=30;
+        }
+        const patternCanvas = document.createElement('canvas');
+        patternCanvas.width=64; patternCanvas.height=64;
+        patternCanvas.getContext('2d').putImageData(noise,0,0);
+        const pattern = ctx.createPattern(patternCanvas,'repeat');
+        ctx.globalAlpha=0.3; ctx.fillStyle=pattern; ctx.fillRect(0,0,w,h); ctx.globalAlpha=1;
+      } else {
+        const grad = ctx.createLinearGradient(0,0,w,h);
+        grad.addColorStop(0, pColor);
+        grad.addColorStop(1, sColor);
+        ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+      }
+    }
+
+    function drawImageContained(img, x, y, w, h, radius=24, shadow=8){
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.25)';
+      ctx.shadowBlur = shadow; ctx.shadowOffsetY = shadow/2;
+      roundRect(ctx, x, y, w, h, radius); ctx.clip();
+      const ir = img.width/img.height; const ar = w/h;
+      let dw, dh, dx, dy;
+      if(ir>ar){ dh = h; dw = dh*ir; dx = x + (w-dw)/2; dy = y; }
+      else { dw = w; dh = dw/ir; dx = x; dy = y + (h-dh)/2; }
+      ctx.drawImage(img, dx, dy, dw, dh);
+      ctx.restore();
+    }
+
+    function wrapText(text, maxWidth, fontSize){
+      const words = text.split(''); // character-wise for CJK
+      let lines=[''];
+      ctx.font = `600 ${fontSize}px system-ui, -apple-system, Segoe UI, Roboto`;
+      for(const ch of words){
+        const test = lines[lines.length-1] + ch;
+        if(ctx.measureText(test).width > maxWidth){
+          lines.push(ch);
+        } else { lines[lines.length-1] = test; }
+      }
+      return lines;
+    }
+
+    let currentState = { theme:'clean', shadow:8, radius:24 };
+
+    function renderPoster(opts={}){
+      const brand = el('brand').value || 'ChefPro';
+      const productName = el('productName').value || '不粘煎锅 28cm';
+      const price = el('price').value || '199';
+      const bullets = (el('bullets').value || '').split(/\n+/).filter(Boolean).slice(0,8);
+      const pColor = el('primaryColor').value; const sColor= el('secondaryColor').value;
+      const style = el('bgStyle').value; const promo= el('promo').value; const cta= el('cta').value;
+      const {w,h} = parseSize(el('posterSize').value);
+
+      canvas.width = w; canvas.height = h;
+      drawBg(style, pColor, sColor, w, h);
+
+      // theme tweaks
+      const t = currentState.theme;
+      let headColor='#0f172a', textColor='#0b1220', chipBg='rgba(255,255,255,0.75)', chipText='#0b1220';
+      if(t==='bold'){ headColor='#ffffff'; textColor='#ffffff'; chipBg='rgba(0,0,0,0.5)'; chipText='#ffffff'; }
+      if(t==='elegant'){ headColor='#111827'; textColor='#1f2937'; chipBg='rgba(255,255,255,0.65)'; chipText='#111827'; }
+
+      const pad = Math.round(w*0.05);
+      const col1 = pad; const col2 = Math.round(w*0.53);
+      const colGap = Math.round(w*0.03);
+      const imgW = Math.round(w*0.42); const imgH = Math.round(h*0.5);
+
+      // Images
+      if(productImg) drawImageContained(productImg, col1, pad, imgW, imgH, currentState.radius, currentState.shadow);
+      if(resultImg) drawImageContained(resultImg, col1, pad+imgH+colGap, imgW, Math.round(h*0.3), currentState.radius, currentState.shadow);
+
+      // Headings
+      ctx.fillStyle = headColor;
+      ctx.font = `800 ${Math.round(w*0.05)}px system-ui, -apple-system, Segoe UI, Roboto`;
+      ctx.fillText(brand, col2, pad + Math.round(w*0.06));
+
+      ctx.font = `700 ${Math.round(w*0.035)}px system-ui, -apple-system, Segoe UI, Roboto`;
+      const pLines = wrapText(productName, w - col2 - pad, Math.round(w*0.035));
+      pLines.forEach((ln,i)=> ctx.fillText(ln, col2, pad + Math.round(w*0.06) + 20 + i*(Math.round(w*0.04))));
+
+      // Price badge
+      const badgeY = pad + Math.round(w*0.22);
+      const badgeH = Math.round(w*0.1); const badgeW = Math.round(w*0.22);
+      ctx.save();
+      ctx.shadowColor='rgba(0,0,0,0.2)'; ctx.shadowBlur=currentState.shadow; ctx.shadowOffsetY=currentState.shadow/2;
+      roundRect(ctx, col2, badgeY, badgeW, badgeH, 20);
+      ctx.fillStyle = chipBg; ctx.fill();
+      ctx.restore();
+      ctx.fillStyle = chipText;
+      ctx.font = `800 ${Math.round(w*0.05)}px system-ui`; ctx.fillText(`¥${price}`, col2+16, badgeY + badgeH*0.7);
+
+      // Promo chip
+      if(promo){
+        const y = badgeY - 16 - 44;
+        const tw = ctx.measureText(promo).width + 24;
+        ctx.save(); ctx.shadowColor='rgba(0,0,0,0.15)'; ctx.shadowBlur= currentState.shadow/2; ctx.shadowOffsetY=currentState.shadow/3;
+        roundRect(ctx, col2, y, tw, 44, 14); ctx.fillStyle=chipBg; ctx.fill(); ctx.restore();
+        ctx.fillStyle = chipText; ctx.font = `700 ${24}px system-ui`; ctx.fillText(promo, col2+12, y+30);
+      }
+
+      // Bullets
+      ctx.fillStyle = textColor; ctx.font = `500 ${Math.round(w*0.028)}px system-ui`;
+      let by = badgeY + badgeH + 30;
+      bullets.forEach((b,i)=>{
+        const line = `• ${b}`; const lines = wrapText(line, w - col2 - pad, Math.round(w*0.028));
+        lines.forEach((ln, j)=>{ ctx.fillText(ln, col2, by + (i*28) + j*28); });
+        by += (lines.length-1)*28;
+      });
+
+      // CTA bar at bottom
+      const ctaH = Math.round(h*0.09);
+      ctx.save();
+      ctx.globalAlpha=0.9;
+      ctx.fillStyle = 'white';
+      if(t==='bold'){ ctx.fillStyle='rgba(0,0,0,0.4)'; }
+      roundRect(ctx, pad, h - pad - ctaH, w- pad*2, ctaH, currentState.radius);
+      ctx.fill(); ctx.restore();
+      ctx.fillStyle = (t==='bold')? '#ffffff' : '#111827';
+      ctx.font = `700 ${Math.round(w*0.035)}px system-ui`;
+      ctx.fillText(cta || '立即下单 · 限时包邮', pad*1.2, h - pad - ctaH/2 + 12);
+    }
+
+    el('btnRender').onclick=()=>renderPoster();
+
+    // Beautify controls
+    el('btnBeautify').onclick=()=>{
+      currentState.theme = el('theme').value;
+      currentState.shadow = Number(el('shadow').value);
+      currentState.radius = Number(el('radius').value);
+      renderPoster();
+    };
+
+    // Download PNG
+    el('btnDownload').onclick=()=>{
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url; a.download = 'poster.png'; a.click();
+    };
+
+    // Export sharable HTML page that embeds the poster as data URL
+    el('btnShareHtml').onclick=()=>{
+      const dataUrl = canvas.toDataURL('image/png');
+      const brand = el('brand').value || 'ChefPro';
+      const productName = el('productName').value || '不粘煎锅 28cm';
+      const title = `海报 - ${brand} · ${productName}`;
+      const html = `<!doctype html><html lang=\"zh-CN\"><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/><title>${title}</title><style>body{margin:0;background:#0f172a;color:#e2e8f0;font-family:system-ui,-apple-system,Segoe UI,Roboto}.wrap{min-height:100vh;display:grid;place-content:center;padding:24px}.card{background:#0b1220;border:1px solid #334155;border-radius:24px;box-shadow:0 10px 50px rgba(0,0,0,.5);padding:16px}.card img{max-width:min(90vw,1100px);height:auto;display:block;border-radius:16px}</style></head><body><div class=\"wrap\"><div class=\"card\"><img alt=\"Poster\" src=\"${dataUrl}\"/></div></div></body></html>`;
+      const blob = new Blob([html], {type:'text/html'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'poster.html';
+      a.click();
+    };
+  </script>
+</body>
+</html>
