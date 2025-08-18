@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>厨具海报生成 · 双步流程 · Banner+左图右厨具+底部产品列</title>
-  <meta name="description" content="两步生成厨具宣传海报：素材上传 → 海报生成。包含顶部Banner（主题+Logo）、上半区左图右厨具（4:6），下半区产品列表。支持导出HTML/PNG用于GitHub Pages。">
+  <title>厨具海报生成 · 两步流程 · Banner+左图(3:7)+右厨具+底部产品列</title>
+  <meta name="description" content="两步生成：素材上传 → 海报生成。四分区版式：顶部Banner（主题+Logo）、左侧菜品图(30%)、右侧厨具主图(70%)+特性引线、底部产品列表+标题。支持导出HTML/PNG用于GitHub Pages。">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .step-active{border-color:#111827;box-shadow:0 0 0 4px rgb(17 24 39 / 0.08)}
@@ -15,14 +15,14 @@
   <div class="max-w-6xl mx-auto p-4 md:p-8">
     <header class="mb-6 md:mb-8">
       <div class="flex items-center justify-between gap-4 flex-wrap">
-        <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight">厨具海报生成 · 双步流程</h1>
+        <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight">厨具海报生成 · 模板化（四区）</h1>
         <div class="flex items-center gap-2 text-sm">
           <span class="text-slate-500">语言 / Lang:</span>
           <button id="langZh" class="px-3 py-1 rounded-xl border border-slate-300 bg-white hover:bg-slate-100">中文</button>
           <button id="langFr" class="px-3 py-1 rounded-xl border border-slate-300 bg-white hover:bg-slate-100">Français</button>
         </div>
       </div>
-      <p class="text-slate-600 mt-2">1) 素材上传 → 2) 海报生成与导出（HTML/PNG）。顶部 Banner（主题+Logo），上半区左图右厨具（4:6），下半区产品列表说明。</p>
+      <p class="text-slate-600 mt-2">按照你给的建议模板：<strong>Banner</strong> 配色复刻、<strong>左图:右厨具=3:7</strong>，右侧根据特性数量自动引线到厨具关键部位，底部是产品列表及上方标题。流程仅保留两步：素材上传 → 海报生成/导出。</p>
     </header>
 
     <!-- Steps Nav -->
@@ -31,27 +31,27 @@
       <button id="tab2" class="rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-left hover:border-slate-400 transition">2. 海报生成</button>
     </nav>
 
-    <!-- Step 1 -->
+    <!-- Step 1: 素材上传 -->
     <section id="step1" class="rounded-3xl border border-slate-200 bg-white p-4 md:p-6 shadow-sm">
       <h2 class="text-xl md:text-2xl font-bold mb-4">步骤一：素材上传</h2>
 
       <div class="grid md:grid-cols-3 gap-6">
         <div>
-          <label class="block font-semibold mb-2">上传公司 Logo（用于顶部 Banner）</label>
+          <label class="block font-semibold mb-2">上传公司 Logo（用于顶部 Banner 左侧）</label>
           <input id="imgLogo" type="file" accept="image/*" class="file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-slate-800 file:text-white hover:file:bg-black w-full" />
           <div class="mt-3 aspect-[3/1] rounded-2xl bg-slate-100 grid place-content-center overflow-hidden">
             <img id="previewLogo" class="max-h-full max-w-full object-contain" alt="Logo 预览" />
           </div>
         </div>
         <div>
-          <label class="block font-semibold mb-2">左侧场景/菜品图（40% 宽）</label>
+          <label class="block font-semibold mb-2">左侧菜品/场景图（30% 宽）</label>
           <input id="imgLeft" type="file" accept="image/*" class="file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-slate-800 file:text-white hover:file:bg-black w-full" />
           <div class="mt-3 aspect-video rounded-2xl bg-slate-100 grid place-content-center overflow-hidden">
             <img id="previewLeft" class="max-h-full max-w-full object-contain" alt="左图预览" />
           </div>
         </div>
         <div>
-          <label class="block font-semibold mb-2">右侧厨具主图（60% 宽）</label>
+          <label class="block font-semibold mb-2">右侧厨具主图（70% 宽）</label>
           <input id="imgRight" type="file" accept="image/*" class="file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-slate-800 file:text-white hover:file:bg-black w-full" />
           <div class="mt-3 aspect-video rounded-2xl bg-slate-100 grid place-content-center overflow-hidden">
             <img id="previewRight" class="max-h-full max-w-full object-contain" alt="右图预览" />
@@ -60,24 +60,36 @@
       </div>
 
       <div class="grid md:grid-cols-2 gap-6 mt-6">
-        <!-- CN fields -->
+        <!-- 中文字段 -->
         <div id="cnFields">
           <p class="font-semibold mb-2">中文文案</p>
           <div class="grid grid-cols-1 gap-3">
             <input id="cnBannerTitle" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Banner主题（如：燃气灶 / 专业级厨具）" />
             <input id="cnBannerSub" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="副标题（如：当美味需要一点热度）" />
-            <textarea id="cnFeatures" rows="4" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="右侧厨具特性（每行一条，自动引出虚线说明）&#10;热效率高&#10;铸铁锅架&#10;不锈钢面板&#10;热电偶熄火保护"></textarea>
-            <textarea id="cnListCaptions" rows="3" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="底部产品列表说明（每行对应一张缩略图的标题，可留空）&#10;单头灶&#10;双头灶&#10;四头灶"></textarea>
+            <input id="cnRightTitle" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="右侧厨具上方标题（如：双灶台 / 高效燃烧）" />
+            <textarea id="cnFeatures" rows="5" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="右侧厨具特性（每行一条，将自动引线到关键部位）
+热电偶熄火保护
+铸铁锅架
+不锈钢面板
+便捷旋钮
+高效燃烧器"></textarea>
+            <input id="cnListTitle" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="底部产品列表标题（如：产品系列 / 型号一览）" />
           </div>
         </div>
-        <!-- FR fields -->
+        <!-- 法语字段 -->
         <div id="frFields" class="hidden">
           <p class="font-semibold mb-2">Texte en français</p>
           <div class="grid grid-cols-1 gap-3">
             <input id="frBannerTitle" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Titre du bandeau (ex: Réchauds gaz)" />
             <input id="frBannerSub" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Sous-titre (ex: Quand les plats ont besoin d'un petit coup de chaud !)" />
-            <textarea id="frFeatures" rows="4" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Caractéristiques à droite (une par ligne)&#10;Haut rendement&#10;Grilles en fonte&#10;Inox 430&#10;Sécurité thermocouple"></textarea>
-            <textarea id="frListCaptions" rows="3" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Légendes de la liste produits (une ligne par vignette)"></textarea>
+            <input id="frRightTitle" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Titre au-dessus du produit (ex: Double foyer, rendement élevé)" />
+            <textarea id="frFeatures" rows="5" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Caractéristiques (une par ligne, reliées aux parties)
+Sécurité thermocouple
+Grilles en fonte
+Inox 430
+Commutateurs pratiques
+Brûleurs haute efficacité"></textarea>
+            <input id="frListTitle" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Titre de la liste produits (ex: Gamme & Modèles)" />
           </div>
         </div>
       </div>
@@ -88,15 +100,36 @@
         <div id="previewList" class="mt-3 grid grid-cols-3 md:grid-cols-6 gap-3"></div>
       </div>
 
+      <div class="grid md:grid-cols-4 gap-4 mt-6">
+        <div>
+          <label class="block font-semibold mb-2">Banner 主色（渐变左）</label>
+          <input id="bannerColorL" type="color" value="#b8001f" class="w-full h-12 rounded-xl border border-slate-300" />
+        </div>
+        <div>
+          <label class="block font-semibold mb-2">Banner 右色（渐变右）</label>
+          <input id="bannerColorR" type="color" value="#f8f8f8" class="w-full h-12 rounded-xl border border-slate-300" />
+        </div>
+        <div>
+          <label class="block font-semibold mb-2">Banner 高度</label>
+          <input id="bannerH" type="range" min="10" max="22" value="14" class="w-full" />
+          <p class="text-xs text-slate-500 mt-1">占海报高度的百分比</p>
+        </div>
+        <div>
+          <label class="block font-semibold mb-2">顶部/底部阴影</label>
+          <input id="shadow" type="range" min="0" max="24" value="10" class="w-full" />
+        </div>
+      </div>
+
       <div class="mt-6 flex items-center gap-3">
         <button id="go2" class="rounded-2xl bg-slate-900 text-white px-5 py-3 shadow hover:bg-black">下一步：生成海报</button>
-        <span class="text-slate-500">(确认素材与文案后进入第二步)</span>
+        <span class="text-slate-500">（确认素材与文案后进入第二步）</span>
       </div>
     </section>
 
-    <!-- Step 2 -->
+    <!-- Step 2: 生成与导出 -->
     <section id="step2" class="hidden rounded-3xl border border-slate-200 bg-white p-4 md:p-6 shadow-sm">
       <h2 class="text-xl md:text-2xl font-bold mb-4">步骤二：海报生成与导出</h2>
+
       <div class="grid md:grid-cols-4 gap-4">
         <div>
           <label class="block font-semibold mb-2">海报尺寸</label>
@@ -107,26 +140,25 @@
           </select>
         </div>
         <div>
-          <label class="block font-semibold mb-2">左右比例</label>
+          <label class="block font-semibold mb-2">左:右 比例</label>
           <select id="split" class="w-full rounded-xl border border-slate-300 px-3 py-2">
-            <option value="4:6" selected>40% : 60%（左图:右厨具）</option>
+            <option value="3:7" selected>30% : 70%（左图:右厨具）</option>
+            <option value="4:6">40% : 60%</option>
             <option value="5:5">50% : 50%</option>
-            <option value="3:7">30% : 70%</option>
           </select>
         </div>
         <div>
-          <label class="block font-semibold mb-2">Banner 主色（渐变左侧）</label>
-          <input id="bannerColor" type="color" value="#b8001f" class="w-full h-12 rounded-xl border border-slate-300" />
+          <label class="block font-semibold mb-2">底部最多展示</label>
+          <select id="listMax" class="w-full rounded-xl border border-slate-300 px-3 py-2">
+            <option value="4">4 张</option>
+            <option value="6" selected>6 张</option>
+            <option value="8">8 张</option>
+          </select>
         </div>
-        <div>
-          <label class="block font-semibold mb-2">Banner 高度</label>
-          <input id="bannerH" type="range" min="10" max="22" value="14" class="w-full" />
-          <p class="text-xs text-slate-500 mt-1">占海报高度的百分比</p>
-        </div>
+        <div class="flex items-end"><button id="btnRender" class="w-full rounded-2xl bg-slate-900 text-white px-5 py-3 shadow hover:bg-black">生成海报预览</button></div>
       </div>
 
-      <div class="mt-6 flex items-center gap-3">
-        <button id="btnRender" class="rounded-2xl bg-slate-900 text-white px-5 py-3 shadow hover:bg-black">生成海报预览</button>
+      <div class="mt-4 flex flex-wrap items-center gap-3">
         <button id="btnDownload" class="rounded-2xl bg-emerald-600 text-white px-5 py-3 shadow hover:bg-emerald-700">下载 PNG</button>
         <button id="btnShareHtml" class="rounded-2xl bg-indigo-600 text-white px-5 py-3 shadow hover:bg-indigo-700">导出可发布 HTML</button>
       </div>
@@ -136,12 +168,12 @@
           <canvas id="canvas" class="w-full rounded-2xl border border-slate-200 shadow"></canvas>
         </div>
         <div class="text-sm text-slate-600">
-          <p class="mb-3 font-semibold">版式说明</p>
+          <p class="mb-3 font-semibold">模板说明</p>
           <ul class="list-disc ml-5 space-y-2">
-            <li>顶部 Banner：左侧 Logo，居中/右侧为主题与副标题（渐变：深红→浅灰）。</li>
-            <li>主体上半区：左为场景/菜品图（默认 4:6），右为厨具主图，自动引出虚线特性标注。</li>
-            <li>底部：产品列表缩略图（最多6张展示）+ 可选标题说明。</li>
-            <li>一键导出自包含 HTML（可直接部署到 GitHub Pages）。</li>
+            <li>顶部 Banner：左侧 Logo，中/右侧为主题与副标题（渐变可调，默认复刻：#b8001f→#f8f8f8）。</li>
+            <li>主体上半区：左为菜品图（默认 3:7），右为厨具主图；右图上方可加标题；特性按行自动生成并用虚线引到厨具关键点。</li>
+            <li>底部：产品列表缩略图（上方可加标题），最多 8 张，常用展示为 4~6 张。</li>
+            <li>一键导出自包含 HTML（适合 GitHub Pages 部署），或直接下载 PNG。</li>
           </ul>
         </div>
       </div>
@@ -183,85 +215,96 @@
     function parseSize(v){ const [w,h]=v.split('x').map(Number); return {w,h}; }
 
     function getTextPack(){
-      if(lang==='fr') return { bannerTitle: $('frBannerTitle').value || 'LES RÉCHAUDS GAZ', bannerSub: $('frBannerSub').value || "QUAND LES PLATS ONT BESOIN D\\'UN PETIT COUP DE CHAUD !", features: ($('frFeatures').value||'').split(/\\n+/).filter(Boolean).slice(0,6), captions: ($('frListCaptions').value||'').split(/\\n+/) };
-      return { bannerTitle: $('cnBannerTitle').value || '燃气灶 / 专业级厨具', bannerSub: $('cnBannerSub').value || '当美味需要一点热度', features: ($('cnFeatures').value||'').split(/\\n+/).filter(Boolean).slice(0,6), captions: ($('cnListCaptions').value||'').split(/\\n+/) };
+      if(lang==='fr') return { bannerTitle: $('frBannerTitle').value || 'LES RÉCHAUDS GAZ', bannerSub: $('frBannerSub').value || "QUAND LES PLATS ONT BESOIN D'UN PETIT COUP DE CHAUD !", rightTitle: $('frRightTitle').value || 'Double foyer · Rendement élevé', features: ($('frFeatures').value||'').split(/
++/).filter(Boolean).slice(0,8), listTitle: $('frListTitle').value || 'Gamme & Modèles' };
+      return { bannerTitle: $('cnBannerTitle').value || '燃气灶 / 专业级厨具', bannerSub: $('cnBannerSub').value || '当美味需要一点热度', rightTitle: $('cnRightTitle').value || '双灶台 · 高效燃烧', features: ($('cnFeatures').value||'').split(/
++/).filter(Boolean).slice(0,8), listTitle: $('cnListTitle').value || '产品系列 / 型号一览' };
     }
 
-    function drawDashedLink(tx,ty,ax,ay){ ctx.save(); ctx.setLineDash([6,6]); ctx.strokeStyle='rgba(0,0,0,0.55)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(tx,ty); const mx=(tx+ax)/2, my=(ty+ay)/2; ctx.quadraticCurveTo(mx,my,ax,ay); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.beginPath(); ctx.arc(tx,ty,3,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(ax,ay,3,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+    function drawDashedLink(tx,ty,ax,ay){ ctx.save(); ctx.setLineDash([6,6]); ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(tx,ty); const mx=(tx+ax)/2, my=(ty+ay)/2; ctx.quadraticCurveTo(mx,my,ax,ay); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.beginPath(); ctx.arc(tx,ty,3,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(ax,ay,3,0,Math.PI*2); ctx.fill(); ctx.restore(); }
 
     function renderPoster(){
       const {w,h} = parseSize($('posterSize').value); canvas.width=w; canvas.height=h; const pad=Math.round(w*0.035);
+      const shadow = Number($('shadow').value);
+
       // background white
       ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,w,h);
 
-      // banner (gradient left -> light gray)
-      const bannerPct = Number($('bannerH').value)/100; const bh = Math.round(h*bannerPct);
-      const grad = ctx.createLinearGradient(0,0,w,0);
-      grad.addColorStop(0, $('bannerColor').value || '#b8001f');
-      grad.addColorStop(1, '#f8f8f8');
+      // === Top Banner ===
+      const bh = Math.round(h * (Number($('bannerH').value)/100));
+      const grad = ctx.createLinearGradient(0,0,w,0); grad.addColorStop(0, $('bannerColorL').value); grad.addColorStop(1, $('bannerColorR').value);
       ctx.fillStyle=grad; ctx.fillRect(0,0,w,bh);
+      if(logoImg){ const lh=Math.min(bh*0.72, Math.round(w*0.08)); const lw=lh*(logoImg.width/logoImg.height); const lx=pad, ly=Math.round((bh-lh)/2); ctx.save(); RR(lx,ly,lw,lh,8); ctx.clip(); drawContained(logoImg,lx,ly,lw,lh); ctx.restore(); }
+      const TP = getTextPack(); ctx.fillStyle='#ffffff'; ctx.textBaseline='alphabetic'; ctx.font=`900 ${Math.round(bh*0.5)}px system-ui, 'Noto Sans', 'Noto Sans SC'`; ctx.fillText(TP.bannerTitle, pad + (logoImg? Math.round(bh*0.85):0) + 16, Math.round(bh*0.66)); ctx.fillStyle='rgba(255,255,255,0.92)'; ctx.font=`400 ${Math.round(bh*0.25)}px system-ui, 'Noto Sans', 'Noto Sans SC'`; ctx.fillText(TP.bannerSub, pad + (logoImg? Math.round(bh*0.85):0) + 16, Math.round(bh*0.92));
 
-      // logo
-      if(logoImg){
-        const lh = Math.min(bh*0.72, Math.round(w*0.08)); const lw = lh * (logoImg.width/logoImg.height);
-        const lx = pad, ly = Math.round((bh-lh)/2);
-        ctx.save(); RR(lx,ly,lw,lh,8); ctx.clip(); drawContained(logoImg,lx,ly,lw,lh); ctx.restore();
-      }
-
-      // banner texts
-      const TP = getTextPack(); ctx.fillStyle='#ffffff'; ctx.textBaseline='alphabetic';
-      ctx.font=`900 ${Math.round(bh*0.52)}px system-ui, 'Noto Sans', 'Noto Sans SC'`;
-      ctx.fillText(TP.bannerTitle, pad + (logoImg? Math.round(bh*0.85):0) + 16, Math.round(bh*0.66));
-      ctx.fillStyle='rgba(255,255,255,0.9)';
-      ctx.font=`400 ${Math.round(bh*0.26)}px system-ui, 'Noto Sans', 'Noto Sans SC'`;
-      ctx.fillText(TP.bannerSub, pad + (logoImg? Math.round(bh*0.85):0) + 16, Math.round(bh*0.92));
-
-      // body areas (under banner)
+      // === Body Top: Left 3 / Right 7 ===
       const gap = Math.round(w*0.02); const bodyTop = bh + pad; const bodyH = h - bh - pad*2; const listH = Math.round(bodyH*0.28); const topH = bodyH - listH - gap;
-      let [l,r] = $('split').value.split(':').map(Number); const total=l+r; l/=total; r/=total; const leftW = Math.round((w - pad*2 - gap) * l); const rightW = Math.round((w - pad*2 - gap) * r);
+      let [l,r] = $('split').value.split(':').map(Number); const total=l+r; l/=total; r/=total; // but default is 3:7
+      const leftW = Math.round((w - pad*2 - gap) * l); const rightW = Math.round((w - pad*2 - gap) * r);
 
-      // left panel (scene)
-      const leftX = pad, leftY = bodyTop, leftH = topH; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.12)'; ctx.shadowBlur=10; ctx.shadowOffsetY=4; RR(leftX,leftY,leftW,leftH,18); ctx.clip(); if(leftImg){ drawContained(leftImg,leftX,leftY,leftW,leftH);} else { ctx.fillStyle='#f1f5f9'; ctx.fillRect(leftX,leftY,leftW,leftH); ctx.fillStyle='#64748b'; ctx.font=`600 ${Math.round(w*0.02)}px system-ui`; ctx.fillText('上传左侧场景图', leftX+20, leftY+40); } ctx.restore();
+      // Left panel (dish/scene)
+      const leftX = pad, leftY = bodyTop, leftH = topH; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.12)'; ctx.shadowBlur=shadow; ctx.shadowOffsetY=shadow/2; RR(leftX,leftY,leftW,leftH,18); ctx.clip(); if(leftImg){ drawContained(leftImg,leftX,leftY,leftW,leftH);} else { ctx.fillStyle='#f1f5f9'; ctx.fillRect(leftX,leftY,leftW,leftH); ctx.fillStyle='#64748b'; ctx.font=`600 ${Math.round(w*0.02)}px system-ui`; ctx.fillText('上传左侧菜品/场景图', leftX+20, leftY+40); } ctx.restore();
 
-      // right panel (product)
-      const rightX = pad + leftW + gap, rightY = bodyTop, rightH = topH; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.12)'; ctx.shadowBlur=10; ctx.shadowOffsetY=4; RR(rightX,rightY,rightW,rightH,18); ctx.clip(); ctx.fillStyle='#f8fafc'; ctx.fillRect(rightX,rightY,rightW,rightH); if(rightImg){ const px=rightX+Math.round(rightW*0.12), pw=rightW-Math.round(rightW*0.24), ph=pw*(rightImg.height/rightImg.width); const py=rightY+Math.max(20, Math.round((rightH-ph)/2)); drawContained(rightImg,px,py,pw,ph);
-        const ax = px+pw*0.55, ay = py+ph*0.45; ctx.fillStyle='#0f172a'; ctx.font=`600 ${Math.round(w*0.022)}px system-ui, 'Noto Sans SC'`;
-        const feats = TP.features; const spots = [
-          {x:rightX+20, y:rightY+30},
-          {x:rightX+rightW-260, y:rightY+30},
-          {x:rightX+20, y:rightY+rightH-30},
-          {x:rightX+rightW-260, y:rightY+rightH-30},
-          {x:rightX+30, y:rightY+rightH/2},
-          {x:rightX+rightW-300, y:rightY+rightH/2}
+      // Right panel (cookware + features)
+      const rightX = pad + leftW + gap, rightY = bodyTop, rightH = topH; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.12)'; ctx.shadowBlur=shadow; ctx.shadowOffsetY=shadow/2; RR(rightX,rightY,rightW,rightH,18); ctx.clip(); ctx.fillStyle='#f8fafc'; ctx.fillRect(rightX,rightY,rightW,rightH);
+      // Right title above product
+      ctx.fillStyle='#0f172a'; ctx.font=`800 ${Math.round(w*0.032)}px system-ui, 'Noto Sans SC'`; ctx.fillText(TP.rightTitle, rightX + Math.round(rightW*0.08), rightY + Math.round(rightH*0.14));
+      if(rightImg){ const px=rightX+Math.round(rightW*0.1), pw=rightW-Math.round(rightW*0.2), ph=pw*(rightImg.height/rightImg.width); const py=rightY + Math.round(rightH*0.18); drawContained(rightImg,px,py,pw,ph);
+        // anchor to a few semantic points around the product box
+        const anchors=[
+          {x:px+pw*0.2, y:py+ph*0.2},
+          {x:px+pw*0.75, y:py+ph*0.18},
+          {x:px+pw*0.25, y:py+ph*0.8},
+          {x:px+pw*0.8, y:py+ph*0.75},
+          {x:px+pw*0.5, y:py+ph*0.45},
+          {x:px+pw*0.1, y:py+ph*0.55},
+          {x:px+pw*0.9, y:py+ph*0.35},
+          {x:px+pw*0.6, y:py+ph*0.9}
         ];
-        feats.forEach((t,i)=>{ if(i>=spots.length) return; const s=spots[i]; ctx.fillText(t, s.x, s.y); drawDashedLink(s.x-6, s.y-12, ax, ay); });
-      } else { ctx.fillStyle='#e2e8f0'; ctx.fillRect(rightX,rightY,rightW,rightH); ctx.fillStyle='#64748b'; ctx.font=`600 ${Math.round(w*0.02)}px system-ui`; ctx.fillText('上传右侧厨具主图（将自动引出特性）', rightX+20, rightY+40); } ctx.restore();
+        // label positions around the panel edges (auto distributed)
+        const labelSpots=[
+          {x:rightX+24, y:rightY+36},
+          {x:rightX+rightW-280, y:rightY+36},
+          {x:rightX+24, y:rightY+rightH-30},
+          {x:rightX+rightW-280, y:rightY+rightH-30},
+          {x:rightX+24, y:rightY+rightH/2},
+          {x:rightX+rightW-300, y:rightY+rightH/2},
+          {x:rightX+rightW-320, y:rightY+rightH*0.3},
+          {x:rightX+60, y:rightY+rightH*0.3}
+        ];
+        ctx.fillStyle='#0f172a'; ctx.font=`600 ${Math.round(w*0.022)}px system-ui, 'Noto Sans SC'`;
+        TP.features.forEach((t,i)=>{ if(i>=anchors.length) return; const a=anchors[i]; const s=labelSpots[i]; ctx.fillText(t, s.x, s.y); drawDashedLink(s.x-6, s.y-12, a.x, a.y); });
+      } else { ctx.fillStyle='#e2e8f0'; ctx.fillRect(rightX,rightY,rightW,rightH); ctx.fillStyle='#64748b'; ctx.font=`600 ${Math.round(w*0.02)}px system-ui`; ctx.fillText('上传右侧厨具主图（自动生成特性引线）', rightX+20, rightY+40); }
+      ctx.restore();
 
-      // bottom list area
-      const listX = pad, listY = bodyTop + topH + gap, listW = w - pad*2, thumbH = Math.min(listH-28, Math.round(w*0.16)); const cols = Math.min(listImgs.length || 5, 6); const spacing = Math.round((listW)*0.01); const cellW = Math.floor((listW - spacing*(cols-1)) / cols);
-      const captions = TP.captions;
-      if((listImgs&&listImgs.length)>0){ for(let i=0;i<listImgs.length && i<6;i++){ const x0 = listX + i*(cellW + spacing); const y0 = listY; const img=listImgs[i]; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.1)'; ctx.shadowBlur=6; ctx.shadowOffsetY=3; RR(x0,y0,cellW,thumbH,12); ctx.clip(); drawContained(img,x0,y0,cellW,thumbH); ctx.restore();
-          if(captions[i]){ ctx.fillStyle='#0f172a'; ctx.font=`600 ${Math.round(w*0.018)}px system-ui`; ctx.fillText(captions[i], x0, y0 + thumbH + 22); }
-        } }
+      // === Bottom list ===
+      const listTitleY = rightY + rightH + gap - Math.round(w*0.01);
+      ctx.fillStyle='#0f172a'; ctx.font=`800 ${Math.round(w*0.03)}px system-ui, 'Noto Sans SC'`; ctx.fillText(TP.listTitle, pad, listTitleY);
+      const listX = pad, listY = listTitleY + Math.round(w*0.02), listW = w - pad*2, thumbH = Math.round((h - listY - pad) * 0.8);
+      const maxItems = Number($('listMax').value); const items = (listImgs||[]).slice(0, maxItems);
+      const cols = Math.min(items.length||4, maxItems); const spacing = Math.round((listW)*0.015); const cellW = Math.floor((listW - spacing*(cols-1)) / Math.max(cols,1)); const hImg = Math.min(Math.round(w*0.16), thumbH);
+      items.forEach((img,i)=>{ const x0 = listX + i*(cellW + spacing); const y0 = listY; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.1)'; ctx.shadowBlur=6; ctx.shadowOffsetY=3; RR(x0,y0,cellW,hImg,12); ctx.clip(); drawContained(img,x0,y0,cellW,hImg); ctx.restore(); });
     }
 
-    document.getElementById('btnRender').onclick=()=>renderPoster();
+    // Buttons
+    $('btnRender').onclick=()=>renderPoster();
 
-    document.getElementById('btnDownload').onclick=()=>{ const url = canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=url; a.download='poster.png'; a.click(); };
+    $('btnDownload').onclick=()=>{ const url = canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=url; a.download='poster.png'; a.click(); };
 
-    document.getElementById('btnShareHtml').onclick=()=>{
+    $('btnShareHtml').onclick=()=>{
       function toData(img){ try{ if(!img) return ''; const c=document.createElement('canvas'); const x=c.getContext('2d'); c.width=img.width; c.height=img.height; x.drawImage(img,0,0); return c.toDataURL('image/png'); }catch(e){ return ''; } }
       const payload = {
         lang,
         fields:{
-          cn:{bannerTitle:$('cnBannerTitle').value, bannerSub:$('cnBannerSub').value, features:$('cnFeatures').value, captions:$('cnListCaptions').value},
-          fr:{bannerTitle:$('frBannerTitle').value, bannerSub:$('frBannerSub').value, features:$('frFeatures').value, captions:$('frListCaptions').value}
+          cn:{bannerTitle:$('cnBannerTitle').value, bannerSub:$('cnBannerSub').value, rightTitle:$('cnRightTitle').value, features:$('cnFeatures').value, listTitle:$('cnListTitle').value},
+          fr:{bannerTitle:$('frBannerTitle').value, bannerSub:$('frBannerSub').value, rightTitle:$('frRightTitle').value, features:$('frFeatures').value, listTitle:$('frListTitle').value}
         },
-        options:{ size:$('posterSize').value, split:$('split').value, bannerColor:$('bannerColor').value, bannerH:$('bannerH').value },
+        options:{ size:$('posterSize').value, split:$('split').value, bannerL:$('bannerColorL').value, bannerR:$('bannerColorR').value, bannerH:$('bannerH').value, shadow:$('shadow').value, listMax:$('listMax').value },
         images:{ logo:toData(logoImg), left:toData(leftImg), right:toData(rightImg), list:(listImgs||[]).slice(0,8).map(toData) }
       };
 
-      const exporter = `<!doctype html><html lang=\\"${lang==='zh'?'zh-CN':'fr'}\\"><head><meta charset=\\"utf-8\\"/><meta name=\\"viewport\\" content=\\"width=device-width,initial-scale=1\\"/><title>海报 Poster</title><style>html,body{margin:0;background:#0f172a;color:#e2e8f0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans','Noto Sans SC'} .wrap{min-height:100vh;display:grid;place-content:center;padding:24px} .card{background:#0b1220;border:1px solid #334155;border-radius:24px;box-shadow:0 10px 50px rgba(0,0,0,.5);padding:16px} canvas{max-width:min(92vw,1100px);height:auto;display:block;border-radius:16px}</style></head><body><div class=\\"wrap\\"><div class=\\"card\\"><canvas id=\\"c\\"></canvas></div></div><script>const P=${JSON.stringify(payload)};const c=document.getElementById('c');const x=c.getContext('2d');function RR(a,b,w,h,r){const rr=Math.min(r,w/2,h/2);x.beginPath();x.moveTo(a+rr,b);x.arcTo(a+w,b,a+w,b+h,rr);x.arcTo(a+w,b+h,a,b+h,rr);x.arcTo(a,b+h,a,b,rr);x.arcTo(a,b,a+w,b,rr);x.closePath();}function draw(img,a,b,w,h){if(!img)return;const i=new Image();i.src=img;i.onload=()=>{const ir=i.width/i.height,ar=w/h;let dw,dh,dx,dy;if(ir>ar){dh=h;dw=dh*ir;dx=a+(w-dw)/2;dy=b;}else{dw=w;dh=dw/ir;dx=a;dy=b+(h-dh)/2;}x.drawImage(i,dx,dy,dw,dh);};}function parse(v){const s=v.split('x').map(Number);return{w:s[0],h:s[1]}}function wrap(str){return(str||'').split(/\\n+/).filter(Boolean)}function render(){const opt=P.options;const S=parse(opt.size);c.width=S.w;c.height=S.h;const pad=Math.round(S.w*.035);x.fillStyle='#fff';x.fillRect(0,0,S.w,S.h);const bh=Math.round(S.h*(Number(opt.bannerH)/100));const g=x.createLinearGradient(0,0,S.w,0);g.addColorStop(0,opt.bannerColor||'#b8001f');g.addColorStop(1,'#f8f8f8');x.fillStyle=g;x.fillRect(0,0,S.w,bh);if(P.images.logo){const li=new Image();li.src=P.images.logo;li.onload=()=>{const lh=Math.min(bh*.72,Math.round(S.w*.08));const lw=lh*(li.width/li.height);const lx=pad,ly=Math.round((bh-lh)/2);x.save();x.beginPath();x.rect(lx,ly,lw,lh);x.clip();x.drawImage(li,lx,ly,lw,lh);x.restore();};}const T=(P.lang==='fr')?{title:P.fields.fr.bannerTitle||'LES RÉCHAUDS GAZ',sub:P.fields.fr.bannerSub||\"QUAND LES PLATS ONT BESOIN D'UN PETIT COUP DE CHAUD !\",features:wrap(P.fields.fr.features),captions:wrap(P.fields.fr.captions)}:{title:P.fields.cn.bannerTitle||'燃气灶 / 专业级厨具',sub:P.fields.cn.bannerSub||'当美味需要一点热度',features:wrap(P.fields.cn.features),captions:wrap(P.fields.cn.captions)};x.fillStyle='#fff';x.textBaseline='alphabetic';x.font='900 '+Math.round(bh*.52)+'px system-ui, Noto Sans, Noto Sans SC';x.fillText(T.title,pad+(P.images.logo?Math.round(bh*.85):0)+16,Math.round(bh*.66));x.fillStyle='rgba(255,255,255,.9)';x.font='400 '+Math.round(bh*.26)+'px system-ui, Noto Sans, Noto Sans SC';x.fillText(T.sub,pad+(P.images.logo?Math.round(bh*.85):0)+16,Math.round(bh*.92));const gap=Math.round(S.w*.02);const bodyTop=bh+pad;const bodyH=S.h-bh-pad*2;const listH=Math.round(bodyH*.28);const topH=bodyH-listH-gap;let lr=opt.split.split(':').map(Number);const tot=lr[0]+lr[1];const l=lr[0]/tot,r=lr[1]/tot;const leftW=Math.round((S.w-pad*2-gap)*l), rightW=Math.round((S.w-pad*2-gap)*r);const leftX=pad,leftY=bodyTop,leftH=topH; x.save();x.beginPath();x.rect(leftX,leftY,leftW,leftH);x.clip(); if(P.images.left){draw(P.images.left,leftX,leftY,leftW,leftH);} else {x.fillStyle='#f1f5f9';x.fillRect(leftX,leftY,leftW,leftH);} x.restore(); const rightX=pad+leftW+gap,rightY=bodyTop,rightH=topH; x.save();x.beginPath();x.rect(rightX,rightY,rightW,rightH);x.clip();x.fillStyle='#f8fafc';x.fillRect(rightX,rightY,rightW,rightH); if(P.images.right){const ri=new Image();ri.src=P.images.right;ri.onload=()=>{const px=rightX+Math.round(rightW*.12),pw=rightW-Math.round(rightW*.24),ph=pw*(ri.height/ri.width);const py=rightY+Math.max(20,Math.round((rightH-ph)/2));x.drawImage(ri,px,py,pw,ph); const ax=px+pw*.55, ay=py+ph*.45; x.fillStyle='#0f172a';x.font='600 '+Math.round(S.w*.022)+'px system-ui, Noto Sans SC'; const spots=[{x:rightX+20,y:rightY+30},{x:rightX+rightW-260,y:rightY+30},{x:rightX+20,y:rightY+rightH-30},{x:rightX+rightW-260,y:rightY+rightH-30},{x:rightX+30,y:rightY+rightH/2},{x:rightX+rightW-300,y:rightY+rightH/2}]; function link(tx,ty){x.save();x.setLineDash([6,6]);x.strokeStyle='rgba(0,0,0,.55)';x.lineWidth=2;x.beginPath();x.moveTo(tx,ty);const mx=(tx+ax)/2,my=(ty+ay)/2;x.quadraticCurveTo(mx,my,ax,ay);x.stroke();x.setLineDash([]);x.fillStyle='rgba(0,0,0,.55)';x.beginPath();x.arc(tx,ty,3,0,Math.PI*2);x.fill();x.beginPath();x.arc(ax,ay,3,0,Math.PI*2);x.fill();x.restore(); } T.features.forEach((t,i)=>{ if(i>=spots.length) return; const s=spots[i]; x.fillText(t,s.x,s.y); link(s.x-6,s.y-12); }); }; } x.restore(); const listX=pad, listY=bodyTop+topH+gap, listW=S.w-pad*2, thumbH=Math.min(listH-28, Math.round(S.w*.16)); const cols=Math.min((P.images.list||[]).length||5,6); const spacing=Math.round(listW*.01); const cellW=Math.floor((listW - spacing*(cols-1))/cols); (P.images.list||[]).slice(0,6).forEach((src,i)=>{const x0=listX + i*(cellW+spacing), y0=listY; x.save();x.beginPath();x.rect(x0,y0,cellW,thumbH);x.clip(); draw(src,x0,y0,cellW,thumbH); x.restore(); if(T.captions[i]){x.fillStyle='#0f172a';x.font='600 '+Math.round(S.w*.018)+'px system-ui';x.fillText(T.captions[i], x0, y0+thumbH+22);} }); } render();<\/script></body></html>`;
+      const exporter = `<!doctype html><html lang=\"${lang==='zh'?'zh-CN':'fr'}\"><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/><title>海报 Poster</title><style>html,body{margin:0;background:#0f172a;color:#e2e8f0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans','Noto Sans SC'} .wrap{min-height:100vh;display:grid;place-content:center;padding:24px} .card{background:#0b1220;border:1px solid #334155;border-radius:24px;box-shadow:0 10px 50px rgba(0,0,0,.5);padding:16px} canvas{max-width:min(92vw,1100px);height:auto;display:block;border-radius:16px}</style></head><body><div class=\"wrap\"><div class=\"card\"><canvas id=\"c\"></canvas></div></div><script>const P=${JSON.stringify(payload)};const c=document.getElementById('c');const x=c.getContext('2d');function RR(a,b,w,h,r){const rr=Math.min(r,w/2,h/2);x.beginPath();x.moveTo(a+rr,b);x.arcTo(a+w,b,a+w,b+h,rr);x.arcTo(a+w,b+h,a,b+h,rr);x.arcTo(a,b+h,a,b,rr);x.arcTo(a,b,a+w,b,rr);x.closePath();}function draw(img,a,b,w,h){if(!img)return;const i=new Image();i.src=img;i.onload=()=>{const ir=i.width/i.height,ar=w/h;let dw,dh,dx,dy;if(ir>ar){dh=h;dw=dh*ir;dx=a+(w-dw)/2;dy=b;}else{dw=w;dh=dw/ir;dx=a;dy=b+(h-dh)/2;}x.drawImage(i,dx,dy,dw,dh);};}function parse(v){const s=v.split('x').map(Number);return{w:s[0],h:s[1]}}function wrap(str){return(str||'').split(/
++/).filter(Boolean)}function render(){const opt=P.options;const S=parse(opt.size);c.width=S.w;c.height=S.h;const pad=Math.round(S.w*.035);x.fillStyle='#fff';x.fillRect(0,0,S.w,S.h);const bh=Math.round(S.h*(Number(opt.bannerH)/100));const g=x.createLinearGradient(0,0,S.w,0);g.addColorStop(0,opt.bannerL);g.addColorStop(1,opt.bannerR);x.fillStyle=g;x.fillRect(0,0,S.w,bh);if(P.images.logo){const li=new Image();li.src=P.images.logo;li.onload=()=>{const lh=Math.min(bh*.72,Math.round(S.w*.08));const lw=lh*(li.width/li.height);const lx=pad,ly=Math.round((bh-lh)/2);x.save();x.beginPath();x.rect(lx,ly,lw,lh);x.clip();x.drawImage(li,lx,ly,lw,lh);x.restore();};}const T=(P.lang==='fr')?{title:P.fields.fr.bannerTitle||'LES RÉCHAUDS GAZ',sub:P.fields.fr.bannerSub||"QUAND LES PLATS ONT BESOIN D'UN PETIT COUP DE CHAUD !",rtitle:P.fields.fr.rightTitle||'Double foyer · Rendement élevé',features:wrap(P.fields.fr.features),listTitle:P.fields.fr.listTitle||'Gamme & Modèles'}:{title:P.fields.cn.bannerTitle||'燃气灶 / 专业级厨具',sub:P.fields.cn.bannerSub||'当美味需要一点热度',rtitle:P.fields.cn.rightTitle||'双灶台 · 高效燃烧',features:wrap(P.fields.cn.features),listTitle:P.fields.cn.listTitle||'产品系列 / 型号一览'};x.fillStyle='#fff';x.textBaseline='alphabetic';x.font='900 '+Math.round(bh*.5)+'px system-ui, Noto Sans, Noto Sans SC';x.fillText(T.title,pad+(P.images.logo?Math.round(bh*.85):0)+16,Math.round(bh*.66));x.fillStyle='rgba(255,255,255,.92)';x.font='400 '+Math.round(bh*.25)+'px system-ui, Noto Sans, Noto Sans SC';x.fillText(T.sub,pad+(P.images.logo?Math.round(bh*.85):0)+16,Math.round(bh*.92));const gap=Math.round(S.w*.02);const bodyTop=bh+pad;const bodyH=S.h-bh-pad*2;const listH=Math.round(bodyH*.28);const topH=bodyH-listH-gap;let lr=opt.split.split(':').map(Number);const tot=lr[0]+lr[1];const l=lr[0]/tot,r=lr[1]/tot;const leftW=Math.round((S.w-pad*2-gap)*l), rightW=Math.round((S.w-pad*2-gap)*r);const leftX=pad,leftY=bodyTop,leftH=topH; x.save();x.beginPath();x.rect(leftX,leftY,leftW,leftH);x.clip(); if(P.images.left){draw(P.images.left,leftX,leftY,leftW,leftH);} else {x.fillStyle='#f1f5f9';x.fillRect(leftX,leftY,leftW,leftH);} x.restore(); const rightX=pad+leftW+gap,rightY=bodyTop,rightH=topH; x.save();x.beginPath();x.rect(rightX,rightY,rightW,rightH);x.clip();x.fillStyle='#f8fafc';x.fillRect(rightX,rightY,rightW,rightH); x.fillStyle='#0f172a';x.font='800 '+Math.round(S.w*.032)+'px system-ui, Noto Sans SC';x.fillText(T.rtitle, rightX+Math.round(rightW*.08), rightY+Math.round(rightH*.14)); if(P.images.right){const ri=new Image();ri.src=P.images.right;ri.onload=()=>{const px=rightX+Math.round(rightW*.1),pw=rightW-Math.round(rightW*.2),ph=pw*(ri.height/ri.width);const py=rightY+Math.round(rightH*.18);x.drawImage(ri,px,py,pw,ph); const anchors=[{x:px+pw*.2,y:py+ph*.2},{x:px+pw*.75,y:py+ph*.18},{x:px+pw*.25,y:py+ph*.8},{x:px+pw*.8,y:py+ph*.75},{x:px+pw*.5,y:py+ph*.45},{x:px+pw*.1,y:py+ph*.55},{x:px+pw*.9,y:py+ph*.35},{x:px+pw*.6,y:py+ph*.9}]; const spots=[{x:rightX+24,y:rightY+36},{x:rightX+rightW-280,y:rightY+36},{x:rightX+24,y:rightY+rightH-30},{x:rightX+rightW-280,y:rightY+rightH-30},{x:rightX+24,y:rightY+rightH/2},{x:rightX+rightW-300,y:rightY+rightH/2},{x:rightX+rightW-320,y:rightY+rightH*.3},{x:rightX+60,y:rightY+rightH*.3}]; x.fillStyle='#0f172a';x.font='600 '+Math.round(S.w*.022)+'px system-ui, Noto Sans SC'; function link(tx,ty,ax,ay){x.save();x.setLineDash([6,6]);x.strokeStyle='rgba(0,0,0,.6)';x.lineWidth=2;x.beginPath();x.moveTo(tx,ty);const mx=(tx+ax)/2,my=(ty+ay)/2;x.quadraticCurveTo(mx,my,ax,ay);x.stroke();x.setLineDash([]);x.beginPath();x.arc(tx,ty,3,0,Math.PI*2);x.fill();x.beginPath();x.arc(ax,ay,3,0,Math.PI*2);x.fill();x.restore(); } T.features.forEach((t,i)=>{ if(i>=anchors.length) return; const a=anchors[i]; const s=spots[i]; x.fillText(t,s.x,s.y); link(s.x-6,s.y-12,a.x,a.y); }); }; } x.restore(); const listTitleY=rightY+rightH+gap-Math.round(S.w*.01); x.fillStyle='#0f172a'; x.font='800 '+Math.round(S.w*.03)+'px system-ui, Noto Sans SC'; x.fillText(T.listTitle, pad, listTitleY); const listX=pad, listY=listTitleY+Math.round(S.w*.02), listW=S.w-pad*2; const maxItems=Number(opt.listMax); const items=(P.images.list||[]).slice(0,maxItems); const cols=Math.min(items.length||4,maxItems); const spacing=Math.round(listW*.015); const cellW=Math.floor((listW - spacing*(cols-1)) / Math.max(cols,1)); const hImg=Math.min(Math.round(S.w*.16), S.h-listY-pad-20); items.forEach((src,i)=>{const x0=listX + i*(cellW+spacing), y0=listY; x.save();x.beginPath();x.rect(x0,y0,cellW,hImg);x.clip(); draw(src,x0,y0,cellW,hImg); x.restore(); }); } render();<\/script></body></html>`;
 
       const blob = new Blob([exporter], {type:'text/html'});
       const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='poster.html'; a.click();
