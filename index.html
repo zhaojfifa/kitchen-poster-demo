@@ -67,12 +67,7 @@
             <input id="cnBannerTitle" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Banner主题（如：燃气灶 / 专业级厨具）" />
             <input id="cnBannerSub" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="副标题（如：当美味需要一点热度）" />
             <input id="cnRightTitle" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="右侧厨具上方标题（如：双灶台 / 高效燃烧）" />
-            <textarea id="cnFeatures" rows="5" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="右侧厨具特性（每行一条，将自动引线到关键部位）
-热电偶熄火保护
-铸铁锅架
-不锈钢面板
-便捷旋钮
-高效燃烧器"></textarea>
+            <textarea id="cnFeatures" rows="5" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="右侧厨具特性（每行一条，将自动引线到关键部位）&#10;热电偶熄火保护&#10;铸铁锅架&#10;不锈钢面板&#10;便捷旋钮&#10;高效燃烧器"></textarea>
             <input id="cnListTitle" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="底部产品列表标题（如：产品系列 / 型号一览）" />
           </div>
         </div>
@@ -83,12 +78,7 @@
             <input id="frBannerTitle" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Titre du bandeau (ex: Réchauds gaz)" />
             <input id="frBannerSub" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Sous-titre (ex: Quand les plats ont besoin d'un petit coup de chaud !)" />
             <input id="frRightTitle" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Titre au-dessus du produit (ex: Double foyer, rendement élevé)" />
-            <textarea id="frFeatures" rows="5" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Caractéristiques (une par ligne, reliées aux parties)
-Sécurité thermocouple
-Grilles en fonte
-Inox 430
-Commutateurs pratiques
-Brûleurs haute efficacité"></textarea>
+            <textarea id="frFeatures" rows="5" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Caractéristiques (une par ligne, reliées aux parties)&#10;Sécurité thermocouple&#10;Grilles en fonte&#10;Inox 430&#10;Commutateurs pratiques&#10;Brûleurs haute efficacité"></textarea>
             <input id="frListTitle" class="rounded-xl border border-slate-300 px-4 py-2" placeholder="Titre de la liste produits (ex: Gamme & Modèles)" />
           </div>
         </div>
@@ -100,7 +90,7 @@ Brûleurs haute efficacité"></textarea>
         <div id="previewList" class="mt-3 grid grid-cols-3 md:grid-cols-6 gap-3"></div>
       </div>
 
-      <div class="grid md:grid-cols-4 gap-4 mt-6">
+      <div class="grid md:grid-cols-5 gap-4 mt-6">
         <div>
           <label class="block font-semibold mb-2">Banner 主色（渐变左）</label>
           <input id="bannerColorL" type="color" value="#b8001f" class="w-full h-12 rounded-xl border border-slate-300" />
@@ -118,6 +108,14 @@ Brûleurs haute efficacité"></textarea>
           <label class="block font-semibold mb-2">顶部/底部阴影</label>
           <input id="shadow" type="range" min="0" max="24" value="10" class="w-full" />
         </div>
+        <div>
+          <label class="block font-semibold mb-2">风格模板</label>
+          <select id="theme" class="w-full rounded-xl border border-slate-300 px-3 py-2">
+            <option value="classic" selected>经典（均衡）</option>
+            <option value="bold">醒目（标题更大）</option>
+            <option value="tech">技术感（右区网格）</option>
+          </select>
+        </div>
       </div>
 
       <div class="mt-6 flex items-center gap-3">
@@ -130,7 +128,7 @@ Brûleurs haute efficacité"></textarea>
     <section id="step2" class="hidden rounded-3xl border border-slate-200 bg-white p-4 md:p-6 shadow-sm">
       <h2 class="text-xl md:text-2xl font-bold mb-4">步骤二：海报生成与导出</h2>
 
-      <div class="grid md:grid-cols-4 gap-4">
+      <div class="grid md:grid-cols-5 gap-4">
         <div>
           <label class="block font-semibold mb-2">海报尺寸</label>
           <select id="posterSize" class="w-full rounded-xl border border-slate-300 px-3 py-2">
@@ -155,6 +153,14 @@ Brûleurs haute efficacité"></textarea>
             <option value="8">8 张</option>
           </select>
         </div>
+        <div>
+          <label class="block font-semibold mb-2">风格模板</label>
+          <select id="theme2" class="w-full rounded-xl border border-slate-300 px-3 py-2">
+            <option value="classic" selected>经典（均衡）</option>
+            <option value="bold">醒目（标题更大）</option>
+            <option value="tech">技术感（右区网格）</option>
+          </select>
+        </div>
         <div class="flex items-end"><button id="btnRender" class="w-full rounded-2xl bg-slate-900 text-white px-5 py-3 shadow hover:bg-black">生成海报预览</button></div>
       </div>
 
@@ -173,7 +179,7 @@ Brûleurs haute efficacité"></textarea>
             <li>顶部 Banner：左侧 Logo，中/右侧为主题与副标题（渐变可调，默认复刻：#b8001f→#f8f8f8）。</li>
             <li>主体上半区：左为菜品图（默认 3:7），右为厨具主图；右图上方可加标题；特性按行自动生成并用虚线引到厨具关键点。</li>
             <li>底部：产品列表缩略图（上方可加标题），最多 8 张，常用展示为 4~6 张。</li>
-            <li>一键导出自包含 HTML（适合 GitHub Pages 部署），或直接下载 PNG。</li>
+            <li>新增 <strong>风格模板选择器</strong>：经典 / 醒目 / 技术感，快速切换字号与细节表现。</li>
           </ul>
         </div>
       </div>
@@ -207,6 +213,14 @@ Brûleurs haute efficacité"></textarea>
       files.forEach(f=>{ const url=URL.createObjectURL(f); const img=new Image(); img.onload=()=>{ listImgs.push(img); }; img.src=url; const el=document.createElement('img'); el.src=url; el.className='w-full h-20 object-cover rounded-lg border'; wrap.appendChild(el); });
     });
 
+    // ===== Templates =====
+    function getTheme(){
+      const t = ($('theme2')?.value) || $('theme').value || 'classic';
+      if(t==='bold') return {title:0.56, sub:0.28, right:0.036, feature:0.024, radius:24, labelWeight:700, grid:false};
+      if(t==='tech') return {title:0.5, sub:0.23, right:0.032, feature:0.02, radius:16, labelWeight:600, grid:true};
+      return {title:0.5, sub:0.25, right:0.032, feature:0.022, radius:18, labelWeight:600, grid:false};
+    }
+
     // Canvas rendering
     const canvas=$('canvas'); const ctx=canvas.getContext('2d');
     const RR=(x,y,w,h,r)=>{ const rr=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+rr,y); ctx.arcTo(x+w,y,x+w,y+h,rr); ctx.arcTo(x+w,y+h,x,y+h,rr); ctx.arcTo(x,y+h,x,y,rr); ctx.arcTo(x,y,x+w,y,rr); ctx.closePath(); };
@@ -226,6 +240,7 @@ Brûleurs haute efficacité"></textarea>
     function renderPoster(){
       const {w,h} = parseSize($('posterSize').value); canvas.width=w; canvas.height=h; const pad=Math.round(w*0.035);
       const shadow = Number($('shadow').value);
+      const theme = getTheme();
 
       // background white
       ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,w,h);
@@ -235,44 +250,27 @@ Brûleurs haute efficacité"></textarea>
       const grad = ctx.createLinearGradient(0,0,w,0); grad.addColorStop(0, $('bannerColorL').value); grad.addColorStop(1, $('bannerColorR').value);
       ctx.fillStyle=grad; ctx.fillRect(0,0,w,bh);
       if(logoImg){ const lh=Math.min(bh*0.72, Math.round(w*0.08)); const lw=lh*(logoImg.width/logoImg.height); const lx=pad, ly=Math.round((bh-lh)/2); ctx.save(); RR(lx,ly,lw,lh,8); ctx.clip(); drawContained(logoImg,lx,ly,lw,lh); ctx.restore(); }
-      const TP = getTextPack(); ctx.fillStyle='#ffffff'; ctx.textBaseline='alphabetic'; ctx.font=`900 ${Math.round(bh*0.5)}px system-ui, 'Noto Sans', 'Noto Sans SC'`; ctx.fillText(TP.bannerTitle, pad + (logoImg? Math.round(bh*0.85):0) + 16, Math.round(bh*0.66)); ctx.fillStyle='rgba(255,255,255,0.92)'; ctx.font=`400 ${Math.round(bh*0.25)}px system-ui, 'Noto Sans', 'Noto Sans SC'`; ctx.fillText(TP.bannerSub, pad + (logoImg? Math.round(bh*0.85):0) + 16, Math.round(bh*0.92));
+      const TP = getTextPack(); ctx.fillStyle='#ffffff'; ctx.textBaseline='alphabetic'; ctx.font=`900 ${Math.round(bh*theme.title)}px system-ui, 'Noto Sans', 'Noto Sans SC'`; ctx.fillText(TP.bannerTitle, pad + (logoImg? Math.round(bh*0.85):0) + 16, Math.round(bh*0.66)); ctx.fillStyle='rgba(255,255,255,0.92)'; ctx.font=`400 ${Math.round(bh*theme.sub)}px system-ui, 'Noto Sans', 'Noto Sans SC'`; ctx.fillText(TP.bannerSub, pad + (logoImg? Math.round(bh*0.85):0) + 16, Math.round(bh*0.92));
 
-      // === Body Top: Left 3 / Right 7 ===
+      // === Body Top: Left / Right ===
       const gap = Math.round(w*0.02); const bodyTop = bh + pad; const bodyH = h - bh - pad*2; const listH = Math.round(bodyH*0.28); const topH = bodyH - listH - gap;
-      let [l,r] = $('split').value.split(':').map(Number); const total=l+r; l/=total; r/=total; // but default is 3:7
+      let [l,r] = $('split').value.split(':').map(Number); const total=l+r; l/=total; r/=total;
       const leftW = Math.round((w - pad*2 - gap) * l); const rightW = Math.round((w - pad*2 - gap) * r);
 
       // Left panel (dish/scene)
-      const leftX = pad, leftY = bodyTop, leftH = topH; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.12)'; ctx.shadowBlur=shadow; ctx.shadowOffsetY=shadow/2; RR(leftX,leftY,leftW,leftH,18); ctx.clip(); if(leftImg){ drawContained(leftImg,leftX,leftY,leftW,leftH);} else { ctx.fillStyle='#f1f5f9'; ctx.fillRect(leftX,leftY,leftW,leftH); ctx.fillStyle='#64748b'; ctx.font=`600 ${Math.round(w*0.02)}px system-ui`; ctx.fillText('上传左侧菜品/场景图', leftX+20, leftY+40); } ctx.restore();
+      const leftX = pad, leftY = bodyTop, leftH = topH; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.12)'; ctx.shadowBlur=shadow; ctx.shadowOffsetY=shadow/2; RR(leftX,leftY,leftW,leftH,theme.radius); ctx.clip(); if(leftImg){ drawContained(leftImg,leftX,leftY,leftW,leftH);} else { ctx.fillStyle='#f1f5f9'; ctx.fillRect(leftX,leftY,leftW,leftH); ctx.fillStyle='#64748b'; ctx.font=`600 ${Math.round(w*0.02)}px system-ui`; ctx.fillText('上传左侧菜品/场景图', leftX+20, leftY+40); } ctx.restore();
 
       // Right panel (cookware + features)
-      const rightX = pad + leftW + gap, rightY = bodyTop, rightH = topH; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.12)'; ctx.shadowBlur=shadow; ctx.shadowOffsetY=shadow/2; RR(rightX,rightY,rightW,rightH,18); ctx.clip(); ctx.fillStyle='#f8fafc'; ctx.fillRect(rightX,rightY,rightW,rightH);
+      const rightX = pad + leftW + gap, rightY = bodyTop, rightH = topH; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.12)'; ctx.shadowBlur=shadow; ctx.shadowOffsetY=shadow/2; RR(rightX,rightY,rightW,rightH,theme.radius); ctx.clip(); ctx.fillStyle='#f8fafc'; ctx.fillRect(rightX,rightY,rightW,rightH);
+      if(theme.grid){ // tech grid
+        ctx.save(); ctx.strokeStyle='rgba(2,6,23,0.06)'; ctx.lineWidth=1; const grid=16; for(let gx=rightX; gx<rightX+rightW; gx+=grid){ ctx.beginPath(); ctx.moveTo(gx,rightY); ctx.lineTo(gx,rightY+rightH); ctx.stroke(); } for(let gy=rightY; gy<rightY+rightH; gy+=grid){ ctx.beginPath(); ctx.moveTo(rightX,gy); ctx.lineTo(rightX+rightW,gy); ctx.stroke(); } ctx.restore();
+      }
       // Right title above product
-      ctx.fillStyle='#0f172a'; ctx.font=`800 ${Math.round(w*0.032)}px system-ui, 'Noto Sans SC'`; ctx.fillText(TP.rightTitle, rightX + Math.round(rightW*0.08), rightY + Math.round(rightH*0.14));
+      ctx.fillStyle='#0f172a'; ctx.font=`800 ${Math.round(w*theme.right)}px system-ui, 'Noto Sans SC'`; ctx.fillText(TP.rightTitle, rightX + Math.round(rightW*0.08), rightY + Math.round(rightH*0.14));
       if(rightImg){ const px=rightX+Math.round(rightW*0.1), pw=rightW-Math.round(rightW*0.2), ph=pw*(rightImg.height/rightImg.width); const py=rightY + Math.round(rightH*0.18); drawContained(rightImg,px,py,pw,ph);
-        // anchor to a few semantic points around the product box
-        const anchors=[
-          {x:px+pw*0.2, y:py+ph*0.2},
-          {x:px+pw*0.75, y:py+ph*0.18},
-          {x:px+pw*0.25, y:py+ph*0.8},
-          {x:px+pw*0.8, y:py+ph*0.75},
-          {x:px+pw*0.5, y:py+ph*0.45},
-          {x:px+pw*0.1, y:py+ph*0.55},
-          {x:px+pw*0.9, y:py+ph*0.35},
-          {x:px+pw*0.6, y:py+ph*0.9}
-        ];
-        // label positions around the panel edges (auto distributed)
-        const labelSpots=[
-          {x:rightX+24, y:rightY+36},
-          {x:rightX+rightW-280, y:rightY+36},
-          {x:rightX+24, y:rightY+rightH-30},
-          {x:rightX+rightW-280, y:rightY+rightH-30},
-          {x:rightX+24, y:rightY+rightH/2},
-          {x:rightX+rightW-300, y:rightY+rightH/2},
-          {x:rightX+rightW-320, y:rightY+rightH*0.3},
-          {x:rightX+60, y:rightY+rightH*0.3}
-        ];
-        ctx.fillStyle='#0f172a'; ctx.font=`600 ${Math.round(w*0.022)}px system-ui, 'Noto Sans SC'`;
+        const anchors=[{x:px+pw*0.2,y:py+ph*0.2},{x:px+pw*0.75,y:py+ph*0.18},{x:px+pw*0.25,y:py+ph*0.8},{x:px+pw*0.8,y:py+ph*0.75},{x:px+pw*0.5,y:py+ph*0.45},{x:px+pw*0.1,y:py+ph*0.55},{x:px+pw*0.9,y:py+ph*0.35},{x:px+pw*0.6,y:py+ph*0.9}];
+        const labelSpots=[{x:rightX+24,y:rightY+36},{x:rightX+rightW-280,y:rightY+36},{x:rightX+24,y:rightY+rightH-30},{x:rightX+rightW-280,y:rightY+rightH-30},{x:rightX+24,y:rightY+rightH/2},{x:rightX+rightW-300,y:rightY+rightH/2},{x:rightX+rightW-320,y:rightY+rightH*0.3},{x:rightX+60,y:rightY+rightH*0.3}];
+        ctx.fillStyle='#0f172a'; ctx.font=`${theme.labelWeight} ${Math.round(w*theme.feature)}px system-ui, 'Noto Sans SC'`;
         TP.features.forEach((t,i)=>{ if(i>=anchors.length) return; const a=anchors[i]; const s=labelSpots[i]; ctx.fillText(t, s.x, s.y); drawDashedLink(s.x-6, s.y-12, a.x, a.y); });
       } else { ctx.fillStyle='#e2e8f0'; ctx.fillRect(rightX,rightY,rightW,rightH); ctx.fillStyle='#64748b'; ctx.font=`600 ${Math.round(w*0.02)}px system-ui`; ctx.fillText('上传右侧厨具主图（自动生成特性引线）', rightX+20, rightY+40); }
       ctx.restore();
@@ -283,7 +281,7 @@ Brûleurs haute efficacité"></textarea>
       const listX = pad, listY = listTitleY + Math.round(w*0.02), listW = w - pad*2, thumbH = Math.round((h - listY - pad) * 0.8);
       const maxItems = Number($('listMax').value); const items = (listImgs||[]).slice(0, maxItems);
       const cols = Math.min(items.length||4, maxItems); const spacing = Math.round((listW)*0.015); const cellW = Math.floor((listW - spacing*(cols-1)) / Math.max(cols,1)); const hImg = Math.min(Math.round(w*0.16), thumbH);
-      items.forEach((img,i)=>{ const x0 = listX + i*(cellW + spacing); const y0 = listY; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.1)'; ctx.shadowBlur=6; ctx.shadowOffsetY=3; RR(x0,y0,cellW,hImg,12); ctx.clip(); drawContained(img,x0,y0,cellW,hImg); ctx.restore(); });
+      items.forEach((img,i)=>{ const x0 = listX + i*(cellW + spacing); const y0 = listY; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.1)'; ctx.shadowBlur=6; ctx.shadowOffsetY=3; RR(x0,y0,cellW,hImg,theme.radius-4); ctx.clip(); drawContained(img,x0,y0,cellW,hImg); ctx.restore(); });
     }
 
     // Buttons
@@ -299,12 +297,11 @@ Brûleurs haute efficacité"></textarea>
           cn:{bannerTitle:$('cnBannerTitle').value, bannerSub:$('cnBannerSub').value, rightTitle:$('cnRightTitle').value, features:$('cnFeatures').value, listTitle:$('cnListTitle').value},
           fr:{bannerTitle:$('frBannerTitle').value, bannerSub:$('frBannerSub').value, rightTitle:$('frRightTitle').value, features:$('frFeatures').value, listTitle:$('frListTitle').value}
         },
-        options:{ size:$('posterSize').value, split:$('split').value, bannerL:$('bannerColorL').value, bannerR:$('bannerColorR').value, bannerH:$('bannerH').value, shadow:$('shadow').value, listMax:$('listMax').value },
+        options:{ size:$('posterSize').value, split:$('split').value, bannerL:$('bannerColorL').value, bannerR:$('bannerColorR').value, bannerH:$('bannerH').value, shadow:$('shadow').value, listMax:$('listMax').value, theme: ($('theme2')?.value)||$('theme').value },
         images:{ logo:toData(logoImg), left:toData(leftImg), right:toData(rightImg), list:(listImgs||[]).slice(0,8).map(toData) }
       };
 
-      const exporter = `<!doctype html><html lang=\"${lang==='zh'?'zh-CN':'fr'}\"><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/><title>海报 Poster</title><style>html,body{margin:0;background:#0f172a;color:#e2e8f0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans','Noto Sans SC'} .wrap{min-height:100vh;display:grid;place-content:center;padding:24px} .card{background:#0b1220;border:1px solid #334155;border-radius:24px;box-shadow:0 10px 50px rgba(0,0,0,.5);padding:16px} canvas{max-width:min(92vw,1100px);height:auto;display:block;border-radius:16px}</style></head><body><div class=\"wrap\"><div class=\"card\"><canvas id=\"c\"></canvas></div></div><script>const P=${JSON.stringify(payload)};const c=document.getElementById('c');const x=c.getContext('2d');function RR(a,b,w,h,r){const rr=Math.min(r,w/2,h/2);x.beginPath();x.moveTo(a+rr,b);x.arcTo(a+w,b,a+w,b+h,rr);x.arcTo(a+w,b+h,a,b+h,rr);x.arcTo(a,b+h,a,b,rr);x.arcTo(a,b,a+w,b,rr);x.closePath();}function draw(img,a,b,w,h){if(!img)return;const i=new Image();i.src=img;i.onload=()=>{const ir=i.width/i.height,ar=w/h;let dw,dh,dx,dy;if(ir>ar){dh=h;dw=dh*ir;dx=a+(w-dw)/2;dy=b;}else{dw=w;dh=dw/ir;dx=a;dy=b+(h-dh)/2;}x.drawImage(i,dx,dy,dw,dh);};}function parse(v){const s=v.split('x').map(Number);return{w:s[0],h:s[1]}}function wrap(str){return(str||'').split(/
-+/).filter(Boolean)}function render(){const opt=P.options;const S=parse(opt.size);c.width=S.w;c.height=S.h;const pad=Math.round(S.w*.035);x.fillStyle='#fff';x.fillRect(0,0,S.w,S.h);const bh=Math.round(S.h*(Number(opt.bannerH)/100));const g=x.createLinearGradient(0,0,S.w,0);g.addColorStop(0,opt.bannerL);g.addColorStop(1,opt.bannerR);x.fillStyle=g;x.fillRect(0,0,S.w,bh);if(P.images.logo){const li=new Image();li.src=P.images.logo;li.onload=()=>{const lh=Math.min(bh*.72,Math.round(S.w*.08));const lw=lh*(li.width/li.height);const lx=pad,ly=Math.round((bh-lh)/2);x.save();x.beginPath();x.rect(lx,ly,lw,lh);x.clip();x.drawImage(li,lx,ly,lw,lh);x.restore();};}const T=(P.lang==='fr')?{title:P.fields.fr.bannerTitle||'LES RÉCHAUDS GAZ',sub:P.fields.fr.bannerSub||"QUAND LES PLATS ONT BESOIN D'UN PETIT COUP DE CHAUD !",rtitle:P.fields.fr.rightTitle||'Double foyer · Rendement élevé',features:wrap(P.fields.fr.features),listTitle:P.fields.fr.listTitle||'Gamme & Modèles'}:{title:P.fields.cn.bannerTitle||'燃气灶 / 专业级厨具',sub:P.fields.cn.bannerSub||'当美味需要一点热度',rtitle:P.fields.cn.rightTitle||'双灶台 · 高效燃烧',features:wrap(P.fields.cn.features),listTitle:P.fields.cn.listTitle||'产品系列 / 型号一览'};x.fillStyle='#fff';x.textBaseline='alphabetic';x.font='900 '+Math.round(bh*.5)+'px system-ui, Noto Sans, Noto Sans SC';x.fillText(T.title,pad+(P.images.logo?Math.round(bh*.85):0)+16,Math.round(bh*.66));x.fillStyle='rgba(255,255,255,.92)';x.font='400 '+Math.round(bh*.25)+'px system-ui, Noto Sans, Noto Sans SC';x.fillText(T.sub,pad+(P.images.logo?Math.round(bh*.85):0)+16,Math.round(bh*.92));const gap=Math.round(S.w*.02);const bodyTop=bh+pad;const bodyH=S.h-bh-pad*2;const listH=Math.round(bodyH*.28);const topH=bodyH-listH-gap;let lr=opt.split.split(':').map(Number);const tot=lr[0]+lr[1];const l=lr[0]/tot,r=lr[1]/tot;const leftW=Math.round((S.w-pad*2-gap)*l), rightW=Math.round((S.w-pad*2-gap)*r);const leftX=pad,leftY=bodyTop,leftH=topH; x.save();x.beginPath();x.rect(leftX,leftY,leftW,leftH);x.clip(); if(P.images.left){draw(P.images.left,leftX,leftY,leftW,leftH);} else {x.fillStyle='#f1f5f9';x.fillRect(leftX,leftY,leftW,leftH);} x.restore(); const rightX=pad+leftW+gap,rightY=bodyTop,rightH=topH; x.save();x.beginPath();x.rect(rightX,rightY,rightW,rightH);x.clip();x.fillStyle='#f8fafc';x.fillRect(rightX,rightY,rightW,rightH); x.fillStyle='#0f172a';x.font='800 '+Math.round(S.w*.032)+'px system-ui, Noto Sans SC';x.fillText(T.rtitle, rightX+Math.round(rightW*.08), rightY+Math.round(rightH*.14)); if(P.images.right){const ri=new Image();ri.src=P.images.right;ri.onload=()=>{const px=rightX+Math.round(rightW*.1),pw=rightW-Math.round(rightW*.2),ph=pw*(ri.height/ri.width);const py=rightY+Math.round(rightH*.18);x.drawImage(ri,px,py,pw,ph); const anchors=[{x:px+pw*.2,y:py+ph*.2},{x:px+pw*.75,y:py+ph*.18},{x:px+pw*.25,y:py+ph*.8},{x:px+pw*.8,y:py+ph*.75},{x:px+pw*.5,y:py+ph*.45},{x:px+pw*.1,y:py+ph*.55},{x:px+pw*.9,y:py+ph*.35},{x:px+pw*.6,y:py+ph*.9}]; const spots=[{x:rightX+24,y:rightY+36},{x:rightX+rightW-280,y:rightY+36},{x:rightX+24,y:rightY+rightH-30},{x:rightX+rightW-280,y:rightY+rightH-30},{x:rightX+24,y:rightY+rightH/2},{x:rightX+rightW-300,y:rightY+rightH/2},{x:rightX+rightW-320,y:rightY+rightH*.3},{x:rightX+60,y:rightY+rightH*.3}]; x.fillStyle='#0f172a';x.font='600 '+Math.round(S.w*.022)+'px system-ui, Noto Sans SC'; function link(tx,ty,ax,ay){x.save();x.setLineDash([6,6]);x.strokeStyle='rgba(0,0,0,.6)';x.lineWidth=2;x.beginPath();x.moveTo(tx,ty);const mx=(tx+ax)/2,my=(ty+ay)/2;x.quadraticCurveTo(mx,my,ax,ay);x.stroke();x.setLineDash([]);x.beginPath();x.arc(tx,ty,3,0,Math.PI*2);x.fill();x.beginPath();x.arc(ax,ay,3,0,Math.PI*2);x.fill();x.restore(); } T.features.forEach((t,i)=>{ if(i>=anchors.length) return; const a=anchors[i]; const s=spots[i]; x.fillText(t,s.x,s.y); link(s.x-6,s.y-12,a.x,a.y); }); }; } x.restore(); const listTitleY=rightY+rightH+gap-Math.round(S.w*.01); x.fillStyle='#0f172a'; x.font='800 '+Math.round(S.w*.03)+'px system-ui, Noto Sans SC'; x.fillText(T.listTitle, pad, listTitleY); const listX=pad, listY=listTitleY+Math.round(S.w*.02), listW=S.w-pad*2; const maxItems=Number(opt.listMax); const items=(P.images.list||[]).slice(0,maxItems); const cols=Math.min(items.length||4,maxItems); const spacing=Math.round(listW*.015); const cellW=Math.floor((listW - spacing*(cols-1)) / Math.max(cols,1)); const hImg=Math.min(Math.round(S.w*.16), S.h-listY-pad-20); items.forEach((src,i)=>{const x0=listX + i*(cellW+spacing), y0=listY; x.save();x.beginPath();x.rect(x0,y0,cellW,hImg);x.clip(); draw(src,x0,y0,cellW,hImg); x.restore(); }); } render();<\/script></body></html>`;
+      const exporter = `<!doctype html><html lang=\"${lang==='zh'?'zh-CN':'fr'}\"><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/><title>海报 Poster</title><style>html,body{margin:0;background:#0f172a;color:#e2e8f0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans','Noto Sans SC'} .wrap{min-height:100vh;display:grid;place-content:center;padding:24px} .card{background:#0b1220;border:1px solid #334155;border-radius:24px;box-shadow:0 10px 50px rgba(0,0,0,.5);padding:16px} canvas{max-width:min(92vw,1100px);height:auto;display:block;border-radius:16px}</style></head><body><div class=\"wrap\"><div class=\"card\"><canvas id=\"c\"></canvas></div></div><script>const P=${JSON.stringify(payload)};const c=document.getElementById('c');const x=c.getContext('2d');function RR(a,b,w,h,r){const rr=Math.min(r,w/2,h/2);x.beginPath();x.moveTo(a+rr,b);x.arcTo(a+w,b,a+w,b+h,rr);x.arcTo(a+w,b+h,a,b+h,rr);x.arcTo(a,b+h,a,b,rr);x.arcTo(a,b,a+w,b,rr);x.closePath();}function draw(img,a,b,w,h){if(!img)return;const i=new Image();i.src=img;i.onload=()=>{const ir=i.width/i.height,ar=w/h;let dw,dh,dx,dy;if(ir>ar){dh=h;dw=dh*ir;dx=a+(w-dw)/2;dy=b;}else{dw=w;dh=dw/ir;dx=a;dy=b+(h-dh)/2;}x.drawImage(i,dx,dy,dw,dh);};}function parse(v){const s=v.split('x').map(Number);return{w:s[0],h:s[1]}}function wrap(str){return(str||'').split(/\n+/).filter(Boolean)}function theme(){const t=P.options.theme||'classic';if(t==='bold')return{title:.56,sub:.28,right:.036,feature:.024,radius:24,labelWeight:700,grid:false};if(t==='tech')return{title:.5,sub:.23,right:.032,feature:.02,radius:16,labelWeight:600,grid:true};return{title:.5,sub:.25,right:.032,feature:.022,radius:18,labelWeight:600,grid:false};}function render(){const opt=P.options;const th=theme();const S=parse(opt.size);c.width=S.w;c.height=S.h;const pad=Math.round(S.w*.035);x.fillStyle='#fff';x.fillRect(0,0,S.w,S.h);const bh=Math.round(S.h*(Number(opt.bannerH)/100));const g=x.createLinearGradient(0,0,S.w,0);g.addColorStop(0,opt.bannerL);g.addColorStop(1,opt.bannerR);x.fillStyle=g;x.fillRect(0,0,S.w,bh);if(P.images.logo){const li=new Image();li.src=P.images.logo;li.onload=()=>{const lh=Math.min(bh*.72,Math.round(S.w*.08));const lw=lh*(li.width/li.height);const lx=pad,ly=Math.round((bh-lh)/2);x.save();x.beginPath();x.rect(lx,ly,lw,lh);x.clip();x.drawImage(li,lx,ly,lw,lh);x.restore();};}const T=(P.lang==='fr')?{title:P.fields.fr.bannerTitle||'LES RÉCHAUDS GAZ',sub:P.fields.fr.bannerSub||"QUAND LES PLATS ONT BESOIN D'UN PETIT COUP DE CHAUD !",rtitle:P.fields.fr.rightTitle||'Double foyer · Rendement élevé',features:wrap(P.fields.fr.features),listTitle:P.fields.fr.listTitle||'Gamme & Modèles'}:{title:P.fields.cn.bannerTitle||'燃气灶 / 专业级厨具',sub:P.fields.cn.bannerSub||'当美味需要一点热度',rtitle:P.fields.cn.rightTitle||'双灶台 · 高效燃烧',features:wrap(P.fields.cn.features),listTitle:P.fields.cn.listTitle||'产品系列 / 型号一览'};x.fillStyle='#fff';x.textBaseline='alphabetic';x.font='900 '+Math.round(bh*th.title)+'px system-ui, Noto Sans, Noto Sans SC';x.fillText(T.title,pad+(P.images.logo?Math.round(bh*.85):0)+16,Math.round(bh*.66));x.fillStyle='rgba(255,255,255,.92)';x.font='400 '+Math.round(bh*th.sub)+'px system-ui, Noto Sans, Noto Sans SC';x.fillText(T.sub,pad+(P.images.logo?Math.round(bh*.85):0)+16,Math.round(bh*.92));const gap=Math.round(S.w*.02);const bodyTop=bh+pad;const bodyH=S.h-bh-pad*2;const listH=Math.round(bodyH*.28);const topH=bodyH-listH-gap;let lr=opt.split.split(':').map(Number);const tot=lr[0]+lr[1];const l=lr[0]/tot,r=lr[1]/tot;const leftW=Math.round((S.w-pad*2-gap)*l), rightW=Math.round((S.w-pad*2-gap)*r);const leftX=pad,leftY=bodyTop,leftH=topH; x.save();x.beginPath();x.rect(leftX,leftY,leftW,leftH);x.clip(); if(P.images.left){draw(P.images.left,leftX,leftY,leftW,leftH);} else {x.fillStyle='#f1f5f9';x.fillRect(leftX,leftY,leftW,leftH);} x.restore(); const rightX=pad+leftW+gap,rightY=bodyTop,rightH=topH; x.save();x.beginPath();x.rect(rightX,rightY,rightW,rightH);x.clip();x.fillStyle='#f8fafc';x.fillRect(rightX,rightY,rightW,rightH); if(th.grid){x.save();x.strokeStyle='rgba(2,6,23,.06)';x.lineWidth=1;for(let gx=rightX;gx<rightX+rightW;gx+=16){x.beginPath();x.moveTo(gx,rightY);x.lineTo(gx,rightY+rightH);x.stroke();}for(let gy=rightY;gy<rightY+rightH;gy+=16){x.beginPath();x.moveTo(rightX,gy);x.lineTo(rightX+rightW,gy);x.stroke();}x.restore();} x.fillStyle='#0f172a';x.font='800 '+Math.round(S.w*th.right)+'px system-ui, Noto Sans SC';x.fillText(T.rtitle, rightX+Math.round(rightW*.08), rightY+Math.round(rightH*.14)); if(P.images.right){const ri=new Image();ri.src=P.images.right;ri.onload=()=>{const px=rightX+Math.round(rightW*.1),pw=rightW-Math.round(rightW*.2),ph=pw*(ri.height/ri.width);const py=rightY+Math.round(rightH*.18);x.drawImage(ri,px,py,pw,ph); const anchors=[{x:px+pw*.2,y:py+ph*.2},{x:px+pw*.75,y:py+ph*.18},{x:px+pw*.25,y:py+ph*.8},{x:px+pw*.8,y:py+ph*.75},{x:px+pw*.5,y:py+ph*.45},{x:px+pw*.1,y:py+ph*.55},{x:px+pw*.9,y:py+ph*.35},{x:px+pw*.6,y:py+ph*.9}]; const spots=[{x:rightX+24,y:rightY+36},{x:rightX+rightW-280,y:rightY+36},{x:rightX+24,y:rightY+rightH-30},{x:rightX+rightW-280,y:rightY+rightH-30},{x:rightX+24,y:rightY+rightH/2},{x:rightX+rightW-300,y:rightY+rightH/2},{x:rightX+rightW-320,y:rightY+rightH*.3},{x:rightX+60,y:rightY+rightH*.3}]; x.fillStyle='#0f172a';x.font='${'${'}th.labelWeight${'}'} '+Math.round(S.w*th.feature)+'px system-ui, Noto Sans SC'; function link(tx,ty,ax,ay){x.save();x.setLineDash([6,6]);x.strokeStyle='rgba(0,0,0,.6)';x.lineWidth=2;x.beginPath();x.moveTo(tx,ty);const mx=(tx+ax)/2,my=(ty+ay)/2;x.quadraticCurveTo(mx,my,ax,ay);x.stroke();x.setLineDash([]);x.beginPath();x.arc(tx,ty,3,0,Math.PI*2);x.fill();x.beginPath();x.arc(ax,ay,3,0,Math.PI*2);x.fill();x.restore(); } T.features.forEach((t,i)=>{ if(i>=anchors.length) return; const a=anchors[i]; const s=spots[i]; x.fillText(t,s.x,s.y); link(s.x-6,s.y-12,a.x,a.y); }); }; } x.restore(); const listTitleY=rightY+rightH+gap-Math.round(S.w*.01); x.fillStyle='#0f172a'; x.font='800 '+Math.round(S.w*.03)+'px system-ui, Noto Sans SC'; x.fillText(T.listTitle, pad, listTitleY); const listX=pad, listY=listTitleY+Math.round(S.w*.02), listW=S.w-pad*2; const maxItems=Number(opt.listMax); const items=(P.images.list||[]).slice(0,maxItems); const cols=Math.min(items.length||4,maxItems); const spacing=Math.round(listW*.015); const cellW=Math.floor((listW - spacing*(cols-1)) / Math.max(cols,1)); const hImg=Math.min(Math.round(S.w*.16), S.h-listY-pad-20); items.forEach((src,i)=>{const x0=listX + i*(cellW+spacing), y0=listY; x.save();x.beginPath();x.rect(x0,y0,cellW,hImg);x.clip(); draw(src,x0,y0,cellW,hImg); x.restore(); }); } render();<\/script></body></html>`;
 
       const blob = new Blob([exporter], {type:'text/html'});
       const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='poster.html'; a.click();
