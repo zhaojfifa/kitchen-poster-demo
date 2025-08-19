@@ -32,7 +32,7 @@
 <body>
 <div class="wrap">
   <h1 style="margin:0 0 6px">厨具海报生成 · 模板化（四区）</h1>
-  <div style="color:#64748b;margin-bottom:8px">两步：素材上传 → 海报生成；四区：Banner（Logo+主题）/ 左图3:7 / 右厨具+特性引线 / 底部产品列表（标题与说明）。</div>
+  <div style="color:#64748b;margin-bottom:8px">两步：素材上传 → 海报生成；四区：Banner（Logo+主题）/ 左图4:6 / 右厨具+特性引线 / 底部产品列表（标题与说明）。</div>
 
   <div class="tabs">
     <button id="tab1" class="tab active">1. 素材上传</button>
@@ -113,8 +113,8 @@
       <div>
         <label>左:右 比例</label>
         <select id="selSplit">
-          <option value="3:7" selected>30% : 70%</option>
-          <option value="4:6">40% : 60%</option>
+          <option value="3:7">30% : 70%</option>
+          <option value="4:6" selected>40% : 60%</option>
           <option value="5:5">50% : 50%</option>
         </select>
       </div>
@@ -180,7 +180,34 @@ const cv=$('cv'); const ctx=cv.getContext('2d');
 const RR=(x,y,w,h,r)=>{const rr=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();};
 const drawContain=(img,x,y,w,h)=>{const ir=img.width/img.height, ar=w/h;let dw,dh,dx,dy;if(ir>ar){dh=h;dw=dh*ir;dx=x+(w-dw)/2;dy=y;}else{dw=w;dh=dw/ir;dx=x;dy=y+(h-dh)/2;}ctx.drawImage(img,dx,dy,dw,dh);};
 
-function dashedLink(tx,ty,ax,ay,i){ ctx.save(); const styles=[[6,6],[8,5],[5,7],[10,6]]; ctx.setLineDash(styles[i%styles.length]); ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(tx,ty); const wig=30+(i%5)*12; const mx=(tx+ax)/2+(i%2?-wig:wig); const my=(ty+ay)/2+(i%3===0?wig*.6:-wig*.4); ctx.quadraticCurveTo(mx,my,ax,ay); ctx.stroke(); ctx.setLineDash([]); ctx.beginPath(); ctx.arc(tx,ty,3,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(ax,ay,3,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+function dashedLink(tx,ty,ax,ay,i){
+  ctx.save();
+  const styles=[[6,6],[8,5],[5,7],[10,6]];
+  ctx.setLineDash(styles[i%styles.length]);
+  ctx.strokeStyle='rgba(15,23,42,.7)';
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(tx,ty);
+  const wig=30+(i%5)*12;
+  const mx=(tx+ax)/2+(i%2?-wig:wig);
+  const my=(ty+ay)/2+(i%3===0?wig*.6:-wig*.4);
+  ctx.quadraticCurveTo(mx,my,ax,ay);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // endpoints
+  ctx.fillStyle='rgba(15,23,42,.85)';
+  ctx.beginPath(); ctx.arc(tx,ty,3,0,Math.PI*2); ctx.fill();
+  // arrowhead near anchor
+  const ang=Math.atan2(ay-my, ax-mx);
+  const ah=9;
+  ctx.beginPath();
+  ctx.moveTo(ax,ay);
+  ctx.lineTo(ax - ah*Math.cos(ang - Math.PI/6), ay - ah*Math.sin(ang - Math.PI/6));
+  ctx.lineTo(ax - ah*Math.cos(ang + Math.PI/6), ay - ah*Math.sin(ang + Math.PI/6));
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
 function badge(x0,y0,n){ ctx.save(); ctx.fillStyle='#0f172a'; ctx.beginPath(); ctx.arc(x0,y0,10,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#fff'; ctx.font='700 12px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(String(n),x0,y0+.5); ctx.restore(); }
 
 function render(){ const [W,H]=$('selSize').value.split('x').map(Number); cv.width=W; cv.height=H; const pad=Math.round(W*.035), gap=Math.round(W*.02); const th=TH(); const titlePack=TP();
@@ -209,7 +236,7 @@ function render(){ const [W,H]=$('selSize').value.split('x').map(Number); cv.wid
   const listX=pad, listW=W-pad*2, listY=titleY+Math.round(W*.02); const maxItems=Number($('selMax').value); const items=listImgs.slice(0,maxItems); const cols=Math.min(items.length||4,maxItems); const spacing=Math.round(listW*.015); const cellW=Math.floor((listW - spacing*(cols-1)) / Math.max(cols,1)); const hImg=Math.min(Math.round(W*.16),(H-listY-pad));
   items.forEach((img,i)=>{ const x0=listX+i*(cellW+spacing), y0=listY; ctx.save(); RR(x0,y0,cellW,hImg,12); ctx.clip(); drawContain(img,x0,y0,cellW,hImg); ctx.restore(); });
   // captions
-  if(items.length){ ctx.fillStyle='#0f172a'; ctx.textAlign='center'; ctx.font=`500 ${Math.round(W*.018)}px system-ui, 'Noto Sans SC'`; const gapCap=Math.round(W*.018); items.forEach((img,i)=>{ const x0=listX+i*(cellW+spacing); const cx=x0+cellW/2; const cy=listY+hImg+gapCap; const t=TP().captions[i]||''; if(t){ ctx.fillText(t,cx,cy); } }); ctx.textAlign='left'; }
+  if(items.length){ ctx.fillStyle='#0f172a'; ctx.textAlign='center'; ctx.font=`500 ${Math.round(W*.018)}px system-ui, 'Noto Sans SC'`; const gapCap=Math.round(W*.024); items.forEach((img,i)=>{ const x0=listX+i*(cellW+spacing); const cx=x0+cellW/2; const cy=listY+hImg+gapCap; const t=TP().captions[i]||''; if(t){ ctx.fillText(t,cx,cy); } }); ctx.textAlign='left'; }
 }
 
 on($('btnRender'),'click',render);
