@@ -22,7 +22,7 @@
           <button id="langFr" class="px-3 py-1 rounded-xl border border-slate-300 bg-white hover:bg-slate-100">Français</button>
         </div>
       </div>
-      <p class="text-slate-600 mt-2">四分区：<strong>顶部Banner（Logo+主题）</strong>、<strong>左图3:7右厨具</strong>（自动特性引线）、<strong>底部产品列表</strong>。流程仅两步：素材上传 → 海报生成/导出。</p>
+      <p class="text-slate-600 mt-2">四分区：<strong>顶部Banner（Logo+主题）</strong>、<strong>左图3:7右厨具</strong>（自动特性引线，线长错落更有设计感）、<strong>底部产品列表</strong>。两步：素材上传 → 海报生成/导出。</p>
     </header>
 
     <nav class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
@@ -174,10 +174,9 @@
         <div class="text-sm text-slate-600">
           <p class="mb-3 font-semibold">模板说明</p>
           <ul class="list-disc ml-5 space-y-2">
-            <li>顶部 Banner：左侧 Logo，中/右侧为主题与副标题（渐变可调，支持从 Logo 取色）。</li>
-            <li>主体上半区：左为菜品图（默认 3:7），右为厨具主图；右图上方可加标题；特性按行自动生成并用虚线引到厨具关键点。</li>
-            <li>底部：产品列表缩略图（上方可加标题，**标题默认下移一行并居中**）。</li>
-            <li>风格模板选择：经典 / 醒目 / 技术感（右区网格）。</li>
+            <li>顶部 Banner：左侧 Logo，中/右侧为主题与副标题；中文文案默认：主标题 -2 号，副标题 -1 号。</li>
+            <li>主体上半区：左 3 / 右 7；右侧特性自动生成并带<strong>错落长度的引线</strong>。</li>
+            <li>底部列表标题：<strong>下移两行并居中</strong>，缩略图最多 8 张。</li>
           </ul>
         </div>
       </div>
@@ -224,12 +223,15 @@
       $('bannerColorR').value=hex(light);
     };
 
-    // 模板参数（默认字号整体按你的要求缩小：标题-2、副标题-1）
+    // 模板参数（中文文案：主标题-2，副标题-1）
     function getTheme(){
       const t = ($('theme2')?.value) || $('theme').value || 'classic';
-      if(t==='bold') return {title:0.46, sub:0.24, right:0.034, feature:0.022, radius:24, labelWeight:700, grid:false};
-      if(t==='tech') return {title:0.44, sub:0.23, right:0.032, feature:0.02, radius:16, labelWeight:600, grid:true};
-      return {title:0.46, sub:0.22, right:0.032, feature:0.021, radius:18, labelWeight:600, grid:false};
+      const base = (t==='bold') ? {title:0.5, sub:0.25, right:0.036, feature:0.024, radius:24, labelWeight:700, grid:false}
+                 : (t==='tech') ? {title:0.5, sub:0.24, right:0.032, feature:0.02, radius:16, labelWeight:600, grid:true}
+                 : {title:0.5, sub:0.24, right:0.032, feature:0.022, radius:18, labelWeight:600, grid:false};
+      // 仅在中文场景下缩小
+      if(lang==='zh'){ base.title *= 0.92; base.sub *= 0.96; }
+      return base;
     }
 
     // 画布工具
@@ -245,7 +247,27 @@
 +/).filter(Boolean).slice(0,8), listTitle: $('cnListTitle').value || '系列产品一览' };
     }
 
-    function drawDashedLink(tx,ty,ax,ay){ ctx.save(); ctx.setLineDash([6,6]); ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(tx,ty); const mx=(tx+ax)/2, my=(ty+ay)/2; ctx.quadraticCurveTo(mx,my,ax,ay); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.beginPath(); ctx.arc(tx,ty,3,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(ax,ay,3,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+    // 错落弧线
+    function dashedLink(tx,ty,ax,ay,i){
+      ctx.save();
+      const dashes = [[6,6],[8,5],[5,7],[10,6]];
+      ctx.setLineDash(dashes[i % dashes.length]);
+      ctx.strokeStyle='rgba(0,0,0,0.6)';
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.moveTo(tx,ty);
+      // 控制点偏移，制造不同弧度和长度
+      const wiggle = 30 + (i%5)*12; // 线长差异
+      const mx=(tx+ax)/2 + (i%2? -wiggle: wiggle);
+      const my=(ty+ay)/2 + (i%3===0? wiggle*0.6 : -wiggle*0.4);
+      ctx.quadraticCurveTo(mx,my,ax,ay);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='rgba(0,0,0,0.6)';
+      ctx.beginPath(); ctx.arc(tx,ty,3,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(ax,ay,3,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
     function drawNumberBadge(x,y,n){ ctx.save(); ctx.fillStyle='#0f172a'; ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#ffffff'; ctx.font='700 12px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(String(n), x, y+0.5); ctx.restore(); }
 
     function renderPoster(){
@@ -256,7 +278,7 @@
       // 背景
       ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,w,h);
 
-      // 顶部 Banner（标题-2号，副标题-1号）
+      // 顶部 Banner
       const bh = Math.round(h * (Number($('bannerH').value)/100));
       const grad = ctx.createLinearGradient(0,0,w,0); grad.addColorStop(0, $('bannerColorL').value); grad.addColorStop(1, $('bannerColorR').value);
       ctx.fillStyle=grad; ctx.fillRect(0,0,w,bh);
@@ -269,23 +291,23 @@
       const leftW = Math.round((w - pad*2 - gap) * l); const rightW = Math.round((w - pad*2 - gap) * r);
 
       // 左图
-      const leftX = pad, leftY = bodyTop, leftH = topH; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.12)'; ctx.shadowBlur=shadow; ctx.shadowOffsetY=shadow/2; RR(leftX,leftY,leftW,leftH,theme.radius); ctx.clip(); if(leftImg){ drawContained(leftImg,leftX,leftY,leftW,leftH);} else { ctx.fillStyle='#f1f5f9'; ctx.fillRect(leftX,leftY,leftW,leftH); ctx.fillStyle='#64748b'; ctx.font=`600 ${Math.round(w*0.02)}px system-ui`; ctx.fillText('上传左侧菜品/场景图', leftX+20, leftY+40); } ctx.restore();
+      const leftX = pad, leftY = bodyTop, leftH = topH; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.12)'; ctx.shadowBlur=shadow; ctx.shadowOffsetY=shadow/2; RR(leftX,leftY,leftW,leftH,18); ctx.clip(); if(leftImg){ drawContained(leftImg,leftX,leftY,leftW,leftH);} else { ctx.fillStyle='#f1f5f9'; ctx.fillRect(leftX,leftY,leftW,leftH); ctx.fillStyle='#64748b'; ctx.font=`600 ${Math.round(w*0.02)}px system-ui`; ctx.fillText('上传左侧菜品/场景图', leftX+20, leftY+40); } ctx.restore();
 
-      // 右图 + 特性
-      const rightX = pad + leftW + gap, rightY = bodyTop, rightH = topH; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.12)'; ctx.shadowBlur=shadow; ctx.shadowOffsetY=shadow/2; RR(rightX,rightY,rightW,rightH,theme.radius); ctx.clip(); ctx.fillStyle='#f8fafc'; ctx.fillRect(rightX,rightY,rightW,rightH);
+      // 右图 + 特性（引线错落）
+      const rightX = pad + leftW + gap, rightY = bodyTop, rightH = topH; ctx.save(); ctx.shadowColor='rgba(0,0,0,0.12)'; ctx.shadowBlur=shadow; ctx.shadowOffsetY=shadow/2; RR(rightX,rightY,rightW,rightH,18); ctx.clip(); ctx.fillStyle='#f8fafc'; ctx.fillRect(rightX,rightY,rightW,rightH);
       if(theme.grid){ ctx.save(); ctx.strokeStyle='rgba(2,6,23,0.06)'; ctx.lineWidth=1; const grid=16; for(let gx=rightX; gx<rightX+rightW; gx+=grid){ ctx.beginPath(); ctx.moveTo(gx,rightY); ctx.lineTo(gx,rightY+rightH); ctx.stroke(); } for(let gy=rightY; gy<rightY+rightH; gy+=grid){ ctx.beginPath(); ctx.moveTo(rightX,gy); ctx.lineTo(rightX+rightW,gy); ctx.stroke(); } ctx.restore(); }
       ctx.fillStyle='#0f172a'; ctx.font=`800 ${Math.round(w*theme.right)}px system-ui, 'Noto Sans SC'`; ctx.fillText(TP.rightTitle, rightX + Math.round(rightW*0.08), rightY + Math.round(rightH*0.14));
       if(rightImg){ const px=rightX+Math.round(rightW*0.1), pw=rightW-Math.round(rightW*0.2), ph=pw*(rightImg.height/rightImg.width); const py=rightY + Math.round(rightH*0.18); drawContained(rightImg,px,py,pw,ph);
-        const anchors=[{x:px+pw*0.2,y:py+ph*0.2},{x:px+pw*0.75,y:py+ph*0.18},{x:px+pw*0.25,y:py+ph*0.8},{x:px+pw*0.8,y:py+ph*0.75},{x:px+pw*0.5,y:py+ph*0.45},{x:px+pw*0.1,y:py+ph*0.55},{x:px+pw*0.9,y:py+ph*0.35},{x:px+pw*0.6,y:py+ph*0.9}];
-        const labelSpots=[{x:rightX+24,y:rightY+36},{x:rightX+rightW-280,y:rightY+36},{x:rightX+24,y:rightY+rightH-30},{x:rightX+rightW-280,y:rightY+rightH-30},{x:rightX+24,y:rightY+rightH/2},{x:rightX+rightW-300,y:rightY+rightH/2},{x:rightX+rightW-320,y:rightY+rightH*0.3},{x:rightX+60,y:rightY+rightH*0.3}];
-        ctx.fillStyle='#0f172a'; ctx.font=`${theme.labelWeight} ${Math.round(w*theme.feature)}px system-ui, 'Noto Sans SC'`;
-        TP.features.forEach((t,i)=>{ if(i>=anchors.length) return; const a=anchors[i]; const s=labelSpots[i]; drawNumberBadge(s.x-14, s.y-10, i+1); ctx.fillText(t, s.x, s.y); drawDashedLink(s.x-6, s.y-12, a.x, a.y); });
+        const anchors=[{x:px+pw*0.2,y:py+ph*0.22},{x:px+pw*0.78,y:py+ph*0.18},{x:px+pw*0.25,y:py+ph*0.82},{x:px+pw*0.83,y:py+ph*0.72},{x:px+pw*0.5,y:py+ph*0.45},{x:px+pw*0.12,y:py+ph*0.58},{x:px+pw*0.9,y:py+ph*0.33},{x:px+pw*0.62,y:py+ph*0.9}];
+        const labelSpots=[{x:rightX+28,y:rightY+48},{x:rightX+rightW-300,y:rightY+36},{x:rightX+28,y:rightY+rightH-36},{x:rightX+rightW-300,y:rightY+rightH-44},{x:rightX+28,y:rightY+rightH/2-6},{x:rightX+rightW-320,y:rightY+rightH/2+8},{x:rightX+rightW-320,y:rightY+rightH*0.3},{x:rightX+60,y:rightY+rightH*0.28}];
+        ctx.fillStyle='#0f172a'; ctx.font=`600 ${Math.round(w*theme.feature)}px system-ui, 'Noto Sans SC'`;
+        getTextPack().features.forEach((t,i)=>{ if(i>=anchors.length) return; const a=anchors[i]; const s=labelSpots[i]; drawNumberBadge(s.x-14, s.y-10, i+1); ctx.fillText(t, s.x, s.y); dashedLink(s.x-6, s.y-12, a.x, a.y, i); });
       } else { ctx.fillStyle='#e2e8f0'; ctx.fillRect(rightX,rightY,rightW,rightH); ctx.fillStyle='#64748b'; ctx.font=`600 ${Math.round(w*0.02)}px system-ui`; ctx.fillText('上传右侧厨具主图（自动生成特性引线）', rightX+20, rightY+40); }
       ctx.restore();
 
-      // 底部列表标题（按要求：下移一行、居中）
-      const listTitleBaseY = rightY + rightH + gap; // 原始位置
-      const listTitleY = listTitleBaseY + Math.round(w*0.02); // 下移一行
+      // 底部列表标题：下移两行 & 居中
+      const listTitleBaseY = rightY + rightH + gap;
+      const listTitleY = listTitleBaseY + Math.round(w*0.04); // 两行
       ctx.fillStyle='#0f172a'; ctx.textAlign='center';
       ctx.font=`800 ${Math.round(w*0.03)}px system-ui, 'Noto Sans SC'`;
       ctx.fillText(TP.listTitle, w/2, listTitleY);
@@ -304,7 +326,8 @@
       function toData(img){ try{ if(!img) return ''; const c=document.createElement('canvas'); const x=c.getContext('2d'); c.width=img.width; c.height=img.height; x.drawImage(img,0,0); return c.toDataURL('image/png'); }catch(e){ return ''; } }
       const payload = { lang, fields:{ cn:{bannerTitle:$('cnBannerTitle').value, bannerSub:$('cnBannerSub').value, rightTitle:$('cnRightTitle').value, features:$('cnFeatures').value, listTitle:$('cnListTitle').value}, fr:{bannerTitle:$('frBannerTitle').value, bannerSub:$('frBannerSub').value, rightTitle:$('frRightTitle').value, features:$('frFeatures').value, listTitle:$('frListTitle').value } }, options:{ size:$('posterSize').value, split:$('split').value, bannerL:$('bannerColorL').value, bannerR:$('bannerColorR').value, bannerH:$('bannerH').value, shadow:$('shadow').value, listMax:$('listMax').value, theme: ($('theme2')?.value)||$('theme').value }, images:{ logo:toData(logoImg), left:toData(leftImg), right:toData(rightImg), list:(listImgs||[]).slice(0,8).map(toData) } };
 
-      const exporter = `<!doctype html><html lang="${lang==='zh'?'zh-CN':'fr'}"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>海报 Poster</title><style>html,body{margin:0;background:#0f172a;color:#e2e8f0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans','Noto Sans SC'} .wrap{min-height:100vh;display:grid;place-content:center;padding:24px} .card{background:#0b1220;border:1px solid #334155;border-radius:24px;box-shadow:0 10px 50px rgba(0,0,0,.5);padding:16px} canvas{max-width:min(92vw,1100px);height:auto;display:block;border-radius:16px}</style></head><body><div class="wrap"><div class="card"><canvas id="c"></canvas></div></div><script>const P=${JSON.stringify(payload)};const c=document.getElementById('c');const x=c.getContext('2d');function RR(a,b,w,h,r){const rr=Math.min(r,w/2,h/2);x.beginPath();x.moveTo(a+rr,b);x.arcTo(a+w,b,a+w,b+h,rr);x.arcTo(a+w,b+h,a,b+h,rr);x.arcTo(a,b+h,a,b,rr);x.arcTo(a,b,a+w,b,rr);x.closePath();}function draw(img,a,b,w,h){if(!img)return;const i=new Image();i.src=img;i.onload=()=>{const ir=i.width/i.height,ar=w/h;let dw,dh,dx,dy;if(ir>ar){dh=h;dw=dh*ir;dx=a+(w-dw)/2;dy=b;}else{dw=w;dh=dw/ir;dx=a;dy=b+(h-dh)/2;}x.drawImage(i,dx,dy,dw,dh);};}function parse(v){const s=v.split('x').map(Number);return{w:s[0],h:s[1]}}function wrap(str){return(str||'').split(/\n+/).filter(Boolean)}function theme(){const t=P.options.theme||'classic';if(t==='bold')return{title:.46,sub:.24,right:.034,feature:.022,radius:24,labelWeight:700,grid:false};if(t==='tech')return{title:.44,sub:.23,right:.032,feature:.02,radius:16,labelWeight:600,grid:true};return{title:.46,sub:.22,right:.032,feature:.021,radius:18,labelWeight:600,grid:false};}function drawNumberBadge(ax,ay,n){x.save();x.fillStyle='#0f172a';x.beginPath();x.arc(ax,ay,10,0,Math.PI*2);x.fill();x.fillStyle='#fff';x.font='700 12px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillText(String(n),ax,ay+0.5);x.restore();}function link(tx,ty,ax,ay){x.save();x.setLineDash([6,6]);x.strokeStyle='rgba(0,0,0,.6)';x.lineWidth=2;x.beginPath();x.moveTo(tx,ty);const mx=(tx+ax)/2,my=(ty+ay)/2;x.quadraticCurveTo(mx,my,ax,ay);x.stroke();x.setLineDash([]);x.beginPath();x.arc(tx,ty,3,0,Math.PI*2);x.fill();x.beginPath();x.arc(ax,ay,3,0,Math.PI*2);x.fill();x.restore();}function render(){const opt=P.options;const th=theme();const S=parse(opt.size);c.width=S.w;c.height=S.h;const pad=Math.round(S.w*.035);x.fillStyle='#fff';x.fillRect(0,0,S.w,S.h);const bh=Math.round(S.h*(Number(opt.bannerH)/100));const g=x.createLinearGradient(0,0,S.w,0);g.addColorStop(0,opt.bannerL);g.addColorStop(1,opt.bannerR);x.fillStyle=g;x.fillRect(0,0,S.w,bh);if(P.images.logo){const li=new Image();li.src=P.images.logo;li.onload=()=>{const lh=Math.min(bh*.72,Math.round(S.w*.08));const lw=lh*(li.width/li.height);const lx=pad,ly=Math.round((bh-lh)/2);x.save();x.beginPath();x.rect(lx,ly,lw,lh);x.clip();x.drawImage(li,lx,ly,lw,lh);x.restore();};}const T=(P.lang==='fr')?{title:P.fields.fr.bannerTitle||'LES RÉCHAUDS GAZ',sub:P.fields.fr.bannerSub||"QUAND LES PLATS ONT BESOIN D'UN PETIT COUP DE CHAUD !",rtitle:P.fields.fr.rightTitle||'Double foyer · Rendement élevé',features:wrap(P.fields.fr.features),listTitle:P.fields.fr.listTitle||'Gamme & Modèles'}:{title:P.fields.cn.bannerTitle||'专业级厨具',sub:P.fields.cn.bannerSub||'美味只需一个按钮',rtitle:P.fields.cn.rightTitle||'双灶台 · 高效燃烧',features:wrap(P.fields.cn.features),listTitle:P.fields.cn.listTitle||'系列产品一览'};x.fillStyle='#fff';x.textBaseline='alphabetic';x.font='900 '+Math.round(bh*th.title)+'px system-ui, Noto Sans, Noto Sans SC';x.fillText(T.title,pad+(P.images.logo?Math.round(bh*.85):0)+16,Math.round(bh*.66));x.fillStyle='rgba(255,255,255,.92)';x.font='400 '+Math.round(bh*th.sub)+'px system-ui, Noto Sans, Noto Sans SC';x.fillText(T.sub,pad+(P.images.logo?Math.round(bh*.85):0)+16,Math.round(bh*.92));const gap=Math.round(S.w*.02);const bodyTop=bh+pad;const bodyH=S.h-bh-pad*2;const listH=Math.round(bodyH*.28);const topH=bodyH-listH-gap;let lr=opt.split.split(':').map(Number);const tot=lr[0]+lr[1];const l=lr[0]/tot,r=lr[1]/tot;const leftW=Math.round((S.w-pad*2-gap)*l), rightW=Math.round((S.w-pad*2-gap)*r);const leftX=pad,leftY=bodyTop,leftH=topH; x.save();x.beginPath();x.rect(leftX,leftY,leftW,leftH);x.clip(); if(P.images.left){draw(P.images.left,leftX,leftY,leftW,leftH);} else {x.fillStyle='#f1f5f9';x.fillRect(leftX,leftY,leftW,leftH);} x.restore(); const rightX=pad+leftW+gap,rightY=bodyTop,rightH=topH; x.save();x.beginPath();x.rect(rightX,rightY,rightW,rightH);x.clip();x.fillStyle='#f8fafc';x.fillRect(rightX,rightY,rightW,rightH); if(th.grid){x.save();x.strokeStyle='rgba(2,6,23,.06)';x.lineWidth=1;for(let gx=rightX;gx<rightX+rightW;gx+=16){x.beginPath();x.moveTo(gx,rightY);x.lineTo(gx,rightY+rightH);x.stroke();}for(let gy=rightY;gy<rightY+rightH;gy+=16){x.beginPath();x.moveTo(rightX,gy);x.lineTo(rightX+rightW,gy);x.stroke();}x.restore();} x.fillStyle='#0f172a';x.font='800 '+Math.round(S.w*th.right)+'px system-ui, Noto Sans SC';x.fillText(T.rtitle, rightX+Math.round(rightW*.08), rightY+Math.round(rightH*.14)); if(P.images.right){const ri=new Image();ri.src=P.images.right;ri.onload=()=>{const px=rightX+Math.round(rightW*.1),pw=rightW-Math.round(rightW*.2),ph=pw*(ri.height/ri.width);const py=rightY+Math.round(rightH*.18);x.drawImage(ri,px,py,pw,ph); const anchors=[{x:px+pw*.2,y:py+ph*.2},{x:px+pw*.75,y:py+ph*.18},{x:px+pw*.25,y:py+ph*.8},{x:px+pw*.8,y:py+ph*.75},{x:px+pw*.5,y:py+ph*.45},{x:px+pw*.1,y:py+ph*.55},{x:px+pw*.9,y:py+ph*.35},{x:px+pw*.6,y:py+ph*.9}]; const spots=[{x:rightX+24,y:rightY+36},{x:rightX+rightW-280,y:rightY+36},{x:rightX+24,y:rightY+rightH-30},{x:rightX+rightW-280,y:rightY+rightH-30},{x:rightX+24,y:rightY+rightH/2},{x:rightX+rightW-300,y:rightY+rightH/2},{x:rightX+rightW-320,y:rightY+rightH*.3},{x:rightX+60,y:rightY+rightH*.3}]; x.fillStyle='#0f172a';x.font= (th.labelWeight + ' ' + Math.round(S.w*th.feature) + 'px system-ui, Noto Sans SC'); T.features.forEach((t,i)=>{ if(i>=anchors.length) return; const a=anchors[i]; const s=spots[i]; drawNumberBadge(s.x-14, s.y-10, i+1); x.fillText(t,s.x,s.y); link(s.x-6,s.y-12,a.x,a.y); }); }; } x.restore(); const listTitleBaseY=rightY+rightH+gap; const listTitleY=listTitleBaseY+Math.round(S.w*.02); x.fillStyle='#0f172a'; x.textAlign='center'; x.font='800 '+Math.round(S.w*.03)+'px system-ui, Noto Sans SC'; x.fillText(T.listTitle, S.w/2, listTitleY); x.textAlign='left'; const listX=pad, listY=listTitleY+Math.round(S.w*.02), listW=S.w-pad*2; const maxItems=Number(opt.listMax); const items=(P.images.list||[]).slice(0,maxItems); const cols=Math.min(items.length||4,maxItems); const spacing=Math.round(listW*.015); const cellW=Math.floor((listW - spacing*(cols-1)) / Math.max(cols,1)); const hImg=Math.min(Math.round(S.w*.16), S.h-listY-pad-20); items.forEach((src,i)=>{const x0=listX + i*(cellW+spacing), y0=listY; x.save();x.beginPath();x.rect(x0,y0,cellW,hImg);x.clip(); draw(src,x0,y0,cellW,hImg); x.restore(); }); } render();<\/script></body></html>`;
+      // 导出页使用同样的字号与错落引线逻辑
+      const exporter = `<!doctype html><html lang="${lang==='zh'?'zh-CN':'fr'}"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>海报 Poster</title><style>html,body{margin:0;background:#0f172a;color:#e2e8f0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans','Noto Sans SC'} .wrap{min-height:100vh;display:grid;place-content:center;padding:24px} .card{background:#0b1220;border:1px solid #334155;border-radius:24px;box-shadow:0 10px 50px rgba(0,0,0,.5);padding:16px} canvas{max-width:min(92vw,1100px);height:auto;display:block;border-radius:16px}</style></head><body><div class="wrap"><div class="card"><canvas id="c"></canvas></div></div><script>const P=${JSON.stringify(payload)};const c=document.getElementById('c');const x=c.getContext('2d');function RR(a,b,w,h,r){const rr=Math.min(r,w/2,h/2);x.beginPath();x.moveTo(a+rr,b);x.arcTo(a+w,b,a+w,b+h,rr);x.arcTo(a+w,b+h,a,b+h,rr);x.arcTo(a,b+h,a,b,rr);x.arcTo(a,b,a+w,b,rr);x.closePath();}function draw(img,a,b,w,h){if(!img)return;const i=new Image();i.src=img;i.onload=()=>{const ir=i.width/i.height,ar=w/h;let dw,dh,dx,dy;if(ir>ar){dh=h;dw=dh*ir;dx=a+(w-dw)/2;dy=b;}else{dw=w;dh=dw/ir;dx=a;dy=b+(h-dh)/2;}x.drawImage(i,dx,dy,dw,dh);};}function parse(v){const s=v.split('x').map(Number);return{w:s[0],h:s[1]}}function wrap(str){return(str||'').split(/\n+/).filter(Boolean)}function theme(){const t=P.options.theme||'classic';let base=(t==='bold')?{title:.5,sub:.25,right:.036,feature:.024,radius:24,labelWeight:700,grid:false}:(t==='tech')?{title:.5,sub:.24,right:.032,feature:.02,radius:16,labelWeight:600,grid:true}:{title:.5,sub:.24,right:.032,feature:.022,radius:18,labelWeight:600,grid:false}; if(P.lang==='zh'){base.title*=.92;base.sub*=.96;} return base;}function drawBadge(ax,ay,n){x.save();x.fillStyle='#0f172a';x.beginPath();x.arc(ax,ay,10,0,Math.PI*2);x.fill();x.fillStyle='#fff';x.font='700 12px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillText(String(n),ax,ay+.5);x.restore();}function link(tx,ty,ax,ay,i){x.save();const d=[[6,6],[8,5],[5,7],[10,6]];x.setLineDash(d[i%d.length]);x.strokeStyle='rgba(0,0,0,.6)';x.lineWidth=2;x.beginPath();x.moveTo(tx,ty);const wig=30+(i%5)*12;const mx=(tx+ax)/2 + (i%2?-wig:wig);const my=(ty+ay)/2 + (i%3===0? wig*.6 : -wig*.4);x.quadraticCurveTo(mx,my,ax,ay);x.stroke();x.setLineDash([]);x.beginPath();x.arc(tx,ty,3,0,Math.PI*2);x.fill();x.beginPath();x.arc(ax,ay,3,0,Math.PI*2);x.fill();x.restore();}function render(){const opt=P.options;const th=theme();const S=parse(opt.size);c.width=S.w;c.height=S.h;const pad=Math.round(S.w*.035);x.fillStyle='#fff';x.fillRect(0,0,S.w,S.h);const bh=Math.round(S.h*(Number(opt.bannerH)/100));const g=x.createLinearGradient(0,0,S.w,0);g.addColorStop(0,opt.bannerL);g.addColorStop(1,opt.bannerR);x.fillStyle=g;x.fillRect(0,0,S.w,bh);if(P.images.logo){const li=new Image();li.src=P.images.logo;li.onload=()=>{const lh=Math.min(bh*.72,Math.round(S.w*.08));const lw=lh*(li.width/li.height);const lx=pad,ly=Math.round((bh-lh)/2);x.save();x.beginPath();x.rect(lx,ly,lw,lh);x.clip();x.drawImage(li,lx,ly,lw,lh);x.restore();};}const T=(P.lang==='fr')?{title:P.fields.fr.bannerTitle||'LES RÉCHAUDS GAZ',sub:P.fields.fr.bannerSub||"QUAND LES PLATS ONT BESOIN D'UN PETIT COUP DE CHAUD !",rtitle:P.fields.fr.rightTitle||'Double foyer · Rendement élevé',features:wrap(P.fields.fr.features),listTitle:P.fields.fr.listTitle||'Gamme & Modèles'}:{title:P.fields.cn.bannerTitle||'专业级厨具',sub:P.fields.cn.bannerSub||'美味只需一个按钮',rtitle:P.fields.cn.rightTitle||'双灶台 · 高效燃烧',features:wrap(P.fields.cn.features),listTitle:P.fields.cn.listTitle||'系列产品一览'};x.fillStyle='#fff';x.textBaseline='alphabetic';x.font='900 '+Math.round(bh*th.title)+'px system-ui, Noto Sans, Noto Sans SC';x.fillText(T.title,pad+(P.images.logo?Math.round(bh*.85):0)+16,Math.round(bh*.66));x.fillStyle='rgba(255,255,255,.92)';x.font='400 '+Math.round(bh*th.sub)+'px system-ui, Noto Sans, Noto Sans SC';x.fillText(T.sub,pad+(P.images.logo?Math.round(bh*.85):0)+16,Math.round(bh*.92));const gap=Math.round(S.w*.02);const bodyTop=bh+pad;const bodyH=S.h-bh-pad*2;const listH=Math.round(bodyH*.28);const topH=bodyH-listH-gap;let lr=opt.split.split(':').map(Number);const tot=lr[0]+lr[1];const l=lr[0]/tot,r=lr[1]/tot;const leftW=Math.round((S.w-pad*2-gap)*l), rightW=Math.round((S.w-pad*2-gap)*r);const leftX=pad,leftY=bodyTop,leftH=topH; x.save();x.beginPath();x.rect(leftX,leftY,leftW,leftH);x.clip(); if(P.images.left){draw(P.images.left,leftX,leftY,leftW,leftH);} else {x.fillStyle='#f1f5f9';x.fillRect(leftX,leftY,leftW,leftH);} x.restore(); const rightX=pad+leftW+gap,rightY=bodyTop,rightH=topH; x.save();x.beginPath();x.rect(rightX,rightY,rightW,rightH);x.clip();x.fillStyle='#f8fafc';x.fillRect(rightX,rightY,rightW,rightH); if(th.grid){x.save();x.strokeStyle='rgba(2,6,23,.06)';x.lineWidth=1;for(let gx=rightX;gx<rightX+rightW;gx+=16){x.beginPath();x.moveTo(gx,rightY);x.lineTo(gx,rightY+rightH);x.stroke();}for(let gy=rightY;gy<rightY+rightH;gy+=16){x.beginPath();x.moveTo(rightX,gy);x.lineTo(rightX+rightW,gy);x.stroke();}x.restore();} x.fillStyle='#0f172a';x.font='800 '+Math.round(S.w*th.right)+'px system-ui, Noto Sans SC';x.fillText(T.rtitle, rightX+Math.round(rightW*.08), rightY+Math.round(rightH*.14)); if(P.images.right){const ri=new Image();ri.src=P.images.right;ri.onload=()=>{const px=rightX+Math.round(rightW*.1),pw=rightW-Math.round(rightW*.2),ph=pw*(ri.height/ri.width);const py=rightY+Math.round(rightH*.18);x.drawImage(ri,px,py,pw,ph); const anchors=[{x:px+pw*.2,y:py+ph*.22},{x:px+pw*.78,y:py+ph*.18},{x:px+pw*.25,y:py+ph*.82},{x:px+pw*.83,y:py+ph*.72},{x:px+pw*.5,y:py+ph*.45},{x:px+pw*.12,y:py+ph*.58},{x:px+pw*.9,y:py+ph*.33},{x:px+pw*.62,y:py+ph*.9}]; const spots=[{x:rightX+28,y:rightY+48},{x:rightX+rightW-300,y:rightY+36},{x:rightX+28,y:rightY+rightH-36},{x:rightX+rightW-300,y:rightY+rightH-44},{x:rightX+28,y:rightY+rightH/2-6},{x:rightX+rightW-320,y:rightY+rightH/2+8},{x:rightX+rightW-320,y:rightY+rightH*.3},{x:rightX+60,y:rightY+rightH*.28}]; x.fillStyle='#0f172a';x.font='600 '+Math.round(S.w*th.feature)+'px system-ui, Noto Sans SC'; T.features.forEach((t,i)=>{ if(i>=anchors.length) return; const a=anchors[i]; const s=spots[i]; drawBadge(s.x-14, s.y-10, i+1); x.fillText(t,s.x,s.y); link(s.x-6,s.y-12,a.x,a.y,i); }); }; } x.restore(); const listTitleBaseY=rightY+rightH+gap; const listTitleY=listTitleBaseY+Math.round(S.w*.04); x.fillStyle='#0f172a'; x.textAlign='center'; x.font='800 '+Math.round(S.w*.03)+'px system-ui, Noto Sans SC'; x.fillText(T.listTitle, S.w/2, listTitleY); x.textAlign='left'; const listX=pad, listY=listTitleY+Math.round(S.w*.02), listW=S.w-pad*2; const maxItems=Number(opt.listMax); const items=(P.images.list||[]).slice(0,maxItems); const cols=Math.min(items.length||4,maxItems); const spacing=Math.round(listW*.015); const cellW=Math.floor((listW - spacing*(cols-1)) / Math.max(cols,1)); const hImg=Math.min(Math.round(S.w*.16), S.h-listY-pad-20); items.forEach((src,i)=>{const x0=listX + i*(cellW+spacing), y0=listY; x.save();x.beginPath();x.rect(x0,y0,cellW,hImg);x.clip(); draw(src,x0,y0,cellW,hImg); x.restore(); }); } render();<\/script></body></html>`;
 
       const blob = new Blob([exporter], {type:'text/html'});
       const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='poster.html'; a.click();
