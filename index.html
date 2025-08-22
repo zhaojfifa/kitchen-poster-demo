@@ -1,0 +1,486 @@
+<title>海报发布页面（GitHub Pages 版）</title>
+    <meta name="description" content="两步式：素材上传 → 海报生成/导出（PNG/PDF）" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui"] },
+          },
+        },
+      };
+    </script>
+    <style>
+      html, body { height: 100%; background: #f7f7fb; }
+      * { box-sizing: border-box; }
+    </style>
+    <!-- React 18 + Babel (JSX in browser) -->
+    <!-- React 18 -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- html-to-image + jsPDF UMD -->
+    <script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  </head>
+  <body class="min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useMemo, useRef } = React;
+
+      // 兼容 UUID
+      function uuid() {
+        if (crypto && crypto.randomUUID) return crypto.randomUUID();
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+          const r = (Math.random() * 16) | 0,
+            v = c === 'x' ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+      }
+
+      // File -> dataURL
+      async function fileToDataURL(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // 平均色提取
+      async function extractAverageColorFromDataUrl(dataUrl) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const w = 80, h = 80;
+            canvas.width = w; canvas.height = h;
+            ctx.drawImage(img, 0, 0, w, h);
+            const { data } = ctx.getImageData(0, 0, w, h);
+            let r=0,g=0,b=0,c=0;
+            for (let i=0; i<data.length; i+=4) {
+              const a = data[i+3];
+              const rr=data[i], gg=data[i+1], bb=data[i+2];
+              const nearWhite = rr>240 && gg>240 && bb>240;
+              if (a>10 && !nearWhite) { r+=rr; g+=gg; b+=bb; c++; }
+            }
+            if (!c) return resolve('#2b2f36');
+            r = Math.round(r/c); g = Math.round(g/c); b = Math.round(b/c);
+            resolve(rgbToHex(r,g,b));
+          };
+          img.src = dataUrl;
+        });
+      }
+
+      function rgbToHex(r,g,b){
+        return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+      }
+      function hexToRgb(hex){
+        const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return m ? { r: parseInt(m[1],16), g: parseInt(m[2],16), b: parseInt(m[3],16) } : {r:0,g:0,b:0};
+      }
+      function getContrastColor(hex){
+        const {r,g,b} = hexToRgb(hex);
+        const L = (0.299*r + 0.587*g + 0.114*b)/255;
+        return L>0.6 ? '#111' : '#fff';
+      }
+      function lighten(hex, amt=0.15){
+        const {r,g,b}=hexToRgb(hex);
+        const nr=Math.min(255, Math.round(r+(255-r)*amt));
+        const ng=Math.min(255, Math.round(g+(255-g)*amt));
+        const nb=Math.min(255, Math.round(b+(255-b)*amt));
+        return rgbToHex(nr,ng,nb);
+      }
+
+      // 小图标（简洁 SVG）
+      const Icon = {
+        Download: (p)=> (
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        ),
+        Back: (p)=> (
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        ),
+        Pin: (p)=> (
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
+            <path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7z" />
+          </svg>
+        ),
+        Plus: (p)=> (
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        ),
+        Trash: (p)=> (
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+        ),
+      };
+
+      const defaultFeature = () => ({ id: uuid(), part: '', detail: '', pos: null });
+      const defaultProduct = () => ({ id: uuid(), title: '', desc: '', img: '' });
+
+      function SectionTitle({ children }){
+        return <div className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">{children}</div>;
+      }
+      function HelpText({ children }){
+        return <div className="text-xs text-gray-500 mt-1">{children}</div>;
+      }
+
+      function App(){
+        const [step, setStep] = useState(1);
+        const [logo, setLogo] = useState('');
+        const [primaryColor, setPrimaryColor] = useState('#2b2f36');
+        const [themeTitle, setThemeTitle] = useState('海报主题标题');
+        const [subtitle, setSubtitle] = useState('这里是副标题 / Slogan');
+        const [leftImage, setLeftImage] = useState('');
+        const [cookwareImage, setCookwareImage] = useState('');
+        const [cookwareHeading, setCookwareHeading] = useState('厨具亮点');
+        const [features, setFeatures] = useState([defaultFeature()]);
+        const [placingIdx, setPlacingIdx] = useState(null);
+        const [productSectionTitle, setProductSectionTitle] = useState('精选厨具产品');
+        const [products, setProducts] = useState([defaultProduct(), defaultProduct(), defaultProduct()]);
+        const [stylePreset, setStylePreset] = useState('classic');
+        const posterRef = useRef(null);
+
+        async function onUpload(e, setter, alsoExtract=false){
+          const file = e.target.files?.[0];
+          if(!file) return;
+          const url = await fileToDataURL(file);
+          setter(url);
+          if(alsoExtract){
+            const avg = await extractAverageColorFromDataUrl(url);
+            setPrimaryColor(avg);
+          }
+        }
+        function onPlaceMarkerClick(idx){ setPlacingIdx(idx); }
+        function onCookwareImageClick(e){
+          if(placingIdx===null) return;
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = ((e.clientX - rect.left)/rect.width)*100;
+          const y = ((e.clientY - rect.top)/rect.height)*100;
+          setFeatures(prev=>{
+            const d=[...prev]; d[placingIdx] = { ...d[placingIdx], pos: {x,y} }; return d;
+          });
+          setPlacingIdx(null);
+        }
+
+        async function exportPNG(){
+          if(!posterRef.current) return;
+          const dataUrl = await htmlToImage.toPng(posterRef.current, { pixelRatio: 3 });
+          const a = document.createElement('a');
+          a.download = `poster-${Date.now()}.png`;
+          a.href = dataUrl; a.click();
+        }
+        async function exportPDF(){
+          if(!posterRef.current) return;
+          const dataUrl = await htmlToImage.toPng(posterRef.current, { pixelRatio: 3 });
+          const img = new Image(); img.src = dataUrl; await new Promise(r=> img.onload=r);
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF({ orientation:'p', unit:'pt', format:'a4' });
+          const pageW = pdf.internal.pageSize.getWidth();
+          const pageH = pdf.internal.pageSize.getHeight();
+          const ratio = Math.min(pageW / img.width, pageH / img.height);
+          const w = img.width * ratio; const h = img.height * ratio;
+          const x = (pageW - w)/2; const y=(pageH - h)/2;
+          pdf.addImage(dataUrl, 'PNG', x, y, w, h);
+          pdf.save(`poster-${Date.now()}.pdf`);
+        }
+
+        const contrast = useMemo(()=>getContrastColor(primaryColor), [primaryColor]);
+        const presetStyles = useMemo(()=>{
+          if(stylePreset==='minimal'){
+            return { bannerClass:'rounded-2xl border border-white/40 shadow-sm',
+                     bannerGradient:`linear-gradient(180deg, ${lighten(primaryColor,0.25)}, ${primaryColor})`,
+                     titleClass:'tracking-tight' };
+          }
+          if(stylePreset==='bold'){
+            return { bannerClass:'rounded-[28px] shadow-xl ring-1 ring-black/5',
+                     bannerGradient:`radial-gradient(60% 80% at 50% 0%, ${lighten(primaryColor,0.35)}, ${primaryColor})`,
+                     titleClass:'tracking-wider uppercase' };
+          }
+          return { bannerClass:'rounded-3xl shadow-lg',
+                   bannerGradient:`linear-gradient(90deg, ${lighten(primaryColor,0.2)}, ${primaryColor})`,
+                   titleClass:'' };
+        }, [stylePreset, primaryColor]);
+
+        return (
+          <div className="min-h-screen w-full text-gray-900">
+            <div className="mx-auto max-w-7xl px-4 py-6">
+              <header className="flex items-center justify-between gap-4 pb-4">
+                <h1 className="text-2xl font-bold">海报发布页面（GitHub Pages 版）</h1>
+                <div className="flex items-center gap-2">
+                  {step===2 && (
+                    <>
+                      <button onClick={()=>setStep(1)} className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 hover:bg-gray-100" title="返回">
+                        <Icon.Back /> 返回
+                      </button>
+                      <button onClick={exportPNG} className="inline-flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2 text-white hover:opacity-90">
+                        <Icon.Download /> 导出 PNG
+                      </button>
+                      <button onClick={exportPDF} className="inline-flex items-center gap-2 rounded-xl border px-4 py-2 hover:bg-gray-100">
+                        <Icon.Download /> 导出 PDF
+                      </button>
+                    </>
+                  )}
+                </div>
+              </header>
+
+              {/* 步骤卡 */}
+              <div className="mb-6 grid grid-cols-2 gap-3">
+                <div className={`rounded-2xl border p-4 ${step===1? 'border-gray-900 bg-white' : 'border-gray-200 bg-white'}`}>
+                  <div className="text-sm font-semibold">步骤一</div>
+                  <div className="text-lg">素材上传 & 文案录入</div>
+                  <HelpText>上传 Logo/菜品图/厨具图/产品图，并填写主题、副标题、亮点与产品信息。</HelpText>
+                </div>
+                <div className={`rounded-2xl border p-4 ${step===2? 'border-gray-900 bg-white' : 'border-gray-200 bg-white'}`}>
+                  <div className="text-sm font-semibold">步骤二</div>
+                  <div className="text-lg">海报生成 & 导出</div>
+                  <HelpText>选择风格模板，预览并一键导出 PNG/PDF。</HelpText>
+                </div>
+              </div>
+
+              {step===1 && (
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                  {/* Banner 设置 */}
+                  <div className="rounded-2xl border bg-white p-5">
+                    <SectionTitle>顶部 Banner（Logo 配色）</SectionTitle>
+                    <div className="space-y-3">
+                      <label className="block">
+                        <span className="text-sm">上传公司 Logo（自动提取主色）</span>
+                        <input type="file" accept="image/*" onChange={(e)=>onUpload(e,setLogo,true)} className="mt-2 w-full cursor-pointer rounded-lg border p-2"/>
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <label className="text-sm">主色：</label>
+                        <input type="color" value={primaryColor} onChange={(e)=>setPrimaryColor(e.target.value)} className="h-9 w-14 cursor-pointer rounded-lg border" />
+                        <div className="text-xs text-gray-500">文字自动匹配对比色</div>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        <label className="block">
+                          <span className="text-sm">主题（居中）</span>
+                          <input value={themeTitle} onChange={(e)=>setThemeTitle(e.target.value)} className="mt-1 w-full rounded-lg border p-2"/>
+                        </label>
+                        <label className="block">
+                          <span className="text-sm">副标题（居中）</span>
+                          <input value={subtitle} onChange={(e)=>setSubtitle(e.target.value)} className="mt-1 w-full rounded-lg border p-2"/>
+                        </label>
+                      </div>
+                      {logo && <div className="mt-2 rounded-xl border p-2 text-xs text-gray-600">已上传 Logo ✅</div>}
+                    </div>
+                  </div>
+
+                  {/* 中部图片 */}
+                  <div className="rounded-2xl border bg-white p-5">
+                    <SectionTitle>中部图片</SectionTitle>
+                    <div className="grid grid-cols-1 gap-5">
+                      <div>
+                        <div className="mb-2 text-sm font-medium">左侧菜品图（占 4/10 宽度）</div>
+                        <input type="file" accept="image/*" onChange={(e)=>onUpload(e,setLeftImage)} className="w-full cursor-pointer rounded-lg border p-2"/>
+                      </div>
+                      <div>
+                        <div className="mb-2 text-sm font-medium">右侧厨具图（占 6/10 宽度）</div>
+                        <input type="file" accept="image/*" onChange={(e)=>onUpload(e,setCookwareImage)} className="w-full cursor-pointer rounded-lg border p-2"/>
+                      </div>
+                      <label className="block">
+                        <span className="text-sm">厨具上方标题</span>
+                        <input value={cookwareHeading} onChange={(e)=>setCookwareHeading(e.target.value)} className="mt-1 w-full rounded-lg border p-2"/>
+                      </label>
+                      <div className="rounded-xl border p-3">
+                        <div className="mb-3 flex items-center justify-between">
+                          <div className="text-sm font-semibold">特性介绍（与部件对应）</div>
+                          <button className="inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50" onClick={()=>setFeatures(p=>[...p, defaultFeature()])}>
+                            <Icon.Plus /> 新增一条
+                          </button>
+                        </div>
+                        <div className="space-y-3">
+                          {features.map((f, idx)=> (
+                            <div key={f.id} className="grid grid-cols-[28px,1fr,1fr,auto,auto] items-center gap-2">
+                              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white">{idx+1}</div>
+                              <input className="rounded-lg border p-2 text-sm" placeholder="部件/特点（示例：加厚锅底）" value={f.part} onChange={(e)=>setFeatures(prev=>{ const d=[...prev]; d[idx]={...d[idx], part:e.target.value}; return d; })} />
+                              <input className="rounded-lg border p-2 text-sm" placeholder="介绍（示例：受热更均匀）" value={f.detail} onChange={(e)=>setFeatures(prev=>{ const d=[...prev]; d[idx]={...d[idx], detail:e.target.value}; return d; })} />
+                              <button className={`inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 text-xs ${placingIdx===idx ? 'bg-gray-900 text-white':'hover:bg-gray-50'}`} onClick={()=>onPlaceMarkerClick(idx)} title={features[idx].pos ? `已放置：(${features[idx].pos.x.toFixed(0)}%, ${features[idx].pos.y.toFixed(0)}%)` : '在右侧厨具图上点选位置'}>
+                                <Icon.Pin /> 放置标记
+                              </button>
+                              <button className="inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 text-xs hover:bg-red-50 hover:text-red-600" onClick={()=>setFeatures(prev=>prev.filter(x=>x.id!==f.id))}>
+                                <Icon.Trash /> 删除
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <HelpText>点击“放置标记”后，前往右侧厨具图区域单击即可将序号锚定到对应部件位置。</HelpText>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 产品列表 */}
+                  <div className="rounded-2xl border bg-white p-5">
+                    <SectionTitle>产品列表（底部区域）</SectionTitle>
+                    <label className="mb-3 block">
+                      <span className="text-sm">列表区标题</span>
+                      <input value={productSectionTitle} onChange={(e)=>setProductSectionTitle(e.target.value)} className="mt-1 w-full rounded-lg border p-2"/>
+                    </label>
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="text-sm font-semibold">产品项</div>
+                      <button className="inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50" onClick={()=>setProducts(p=>[...p, defaultProduct()])}>
+                        <Icon.Plus /> 新增产品
+                      </button>
+                    </div>
+                    <div className="space-y-4">
+                      {products.map((p, idx)=> (
+                        <div key={p.id} className="grid grid-cols-1 gap-3 rounded-xl border p-3 md:grid-cols-[1fr,1fr,1fr,auto]">
+                          <input className="rounded-lg border p-2 text-sm" placeholder="产品标题（图片上方显示，居中）" value={p.title} onChange={(e)=>setProducts(prev=>{ const d=[...prev]; d[idx]={...d[idx], title:e.target.value}; return d; })} />
+                          <input className="rounded-lg border p-2 text-sm" placeholder="说明文字（图片下方，居中）" value={p.desc} onChange={(e)=>setProducts(prev=>{ const d=[...prev]; d[idx]={...d[idx], desc:e.target.value}; return d; })} />
+                          <label className="flex items-center gap-2 text-sm">
+                            <span className="shrink-0">上传图片</span>
+                            <input type="file" accept="image/*" onChange={async (e)=>{ const f=e.target.files?.[0]; if(!f) return; const url = await fileToDataURL(f); setProducts(prev=>{ const d=[...prev]; d[idx]={...d[idx], img:url}; return d; }); }} className="w-full cursor-pointer rounded-lg border p-2"/>
+                          </label>
+                          <div className="flex items-center justify-end">
+                            <button className="inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm hover:bg-red-50 hover:text-red-600" onClick={()=>setProducts(prev=>prev.filter(x=>x.id!==p.id))}>
+                              <Icon.Trash /> 删除
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-6 flex justify-end">
+                      <button onClick={()=>setStep(2)} className="inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-white hover:opacity-90">进入步骤二：生成海报</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {step===2 && (
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr,380px]">
+                  <div className="rounded-2xl border bg-white p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <SectionTitle>海报预览</SectionTitle>
+                      <label className="inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm">
+                        风格：
+                        <select className="rounded-md border p-1.5" value={stylePreset} onChange={(e)=>setStylePreset(e.target.value)}>
+                          <option value="classic">Classic</option>
+                          <option value="minimal">Minimal</option>
+                          <option value="bold">Bold</option>
+                        </select>
+                      </label>
+                    </div>
+
+                    <div className="w-full overflow-auto">
+                      <div ref={posterRef} className="relative mx-auto select-none overflow-hidden rounded-2xl border" style={{ width: 900, height: 1400, background: '#fff' }}>
+                        {/* 顶部 Banner */}
+                        <div className={`relative p-8 ${presetStyles.bannerClass}`} style={{ height: 240, background: presetStyles.bannerGradient, color: getContrastColor(primaryColor) }}>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                            <div className={`text-5xl font-extrabold drop-shadow-sm ${presetStyles.titleClass}`} style={{ lineHeight: 1.1 }}>{themeTitle}</div>
+                            <div className="mt-3 text-xl opacity-90">{subtitle}</div>
+                          </div>
+                          {logo && (
+                            <div className="absolute right-5 top-5 rounded-xl bg-white/85 p-2 backdrop-blur">
+                              <img src={logo} alt="logo" className="h-12 w-auto object-contain" />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 中部 4:6 */}
+                        <div className="grid h-[820px] grid-cols-10 gap-6 p-8">
+                          <div className="col-span-4">
+                            <div className="h-full w-full overflow-hidden rounded-2xl border bg-gray-100">
+                              {leftImage ? <img src={leftImage} alt="dish" className="h-full w-full object-cover"/> : <div className="flex h-full w-full items-center justify-center text-gray-400">左侧菜品图预览</div>}
+                            </div>
+                          </div>
+
+                          <div className="col-span-6 flex h-full flex-col">
+                            <div className="px-1 text-2xl font-bold text-gray-900">{cookwareHeading}</div>
+                            <div className="relative mt-3 h-[70%] w-full overflow-hidden rounded-2xl border bg-gray-100" onClick={onCookwareImageClick} title={placingIdx!==null ? '单击图片以放置当前特性序号' : ''}>
+                              {cookwareImage ? <img src={cookwareImage} alt="cookware" className="h-full w-full object-cover"/> : <div className="flex h-full w-full items-center justify-center text-gray-400">右侧厨具图预览（可在此放置序号标记）</div>}
+                              {features.map((f,i)=> f.pos ? (
+                                <div key={f.id} className="absolute flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/80 text-sm font-bold text-white shadow" style={{ left: `${f.pos.x}%`, top: `${f.pos.y}%`}} title={`${i+1}. ${f.part}`}>{i+1}</div>
+                              ) : null)}
+                            </div>
+                            <div className="mt-4 grid grid-cols-1 gap-2">
+                              {features.map((f,i)=> (
+                                <div key={f.id} className="flex items-start gap-3">
+                                  <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white">{i+1}</div>
+                                  <div>
+                                    <div className="text-base font-semibold text-gray-900">{f.part || '未命名部件'}</div>
+                                    <div className="text-sm text-gray-600">{f.detail || '在步骤一中填写该部件的介绍文案。'}</div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 底部产品列表 */}
+                        <div className="px-8 pb-8">
+                          <div className="mb-3 text-center text-2xl font-bold text-gray-900">{productSectionTitle}</div>
+                          <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
+                            {products.map((p)=> (
+                              <div key={p.id} className="rounded-2xl border p-4 text-center">
+                                <div className="text-lg font-semibold">{p.title || '产品标题'}</div>
+                                <div className="mt-2 overflow-hidden rounded-xl border bg-gray-50">
+                                  {p.img ? <img src={p.img} alt={p.title} className="h-44 w-full object-cover"/> : <div className="flex h-44 w-full items-center justify-center text-gray-400">产品图</div>}
+                                </div>
+                                <div className="mt-4 text-sm text-gray-700">{p.desc || '这里填写产品说明文字（建议 1-2 行）。'}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 侧栏 */}
+                  <aside className="rounded-2xl border bg-white p-5">
+                    <SectionTitle>导出设置 & 小贴士</SectionTitle>
+                    <div className="space-y-4 text-sm text-gray-700">
+                      <div>
+                        <div className="font-semibold">导出说明</div>
+                        <ul className="list-disc pl-5">
+                          <li>PNG 为高分辨率位图，适合海报预览与线上发布。</li>
+                          <li>PDF 自动适配 A4 纵向，适合打印或分享。</li>
+                          <li>导出前请确认所有图片已上传完成，以获得最佳清晰度。</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <div className="font-semibold">模板风格</div>
+                        <p>可切换 Classic / Minimal / Bold 三种风格，参考 Canva 调性。</p>
+                      </div>
+                      <div className="rounded-xl bg-gray-50 p-3 text-xs text-gray-600">如需自定义尺寸、二维码/价格徽章/水印等元素，可在源码中扩展。</div>
+                    </div>
+                    <div className="mt-6 grid gap-2">
+                      <button onClick={exportPNG} className="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-2 text-white hover:opacity-90"><Icon.Download/> 导出 PNG</button>
+                      <button onClick={exportPDF} className="inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2 hover:bg-gray-100"><Icon.Download/> 导出 PDF</button>
+                      <button onClick={()=>setStep(1)} className="inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2 hover:bg-gray-100"><Icon.Back/> 返回上一步</button>
+                    </div>
+                  </aside>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App/>);
+    </script>
+    <script type="module" src="src/poster-app.js"></script>
+  </body>
+</html>
