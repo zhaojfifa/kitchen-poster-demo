@@ -67,9 +67,6 @@
     </noscript>
   </body>
 </html>
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/index.html b/index.html
-index 5da547108d413652ef42c6facf8e0921560d5e8a..e29c2ffbf8de787acf60e740f5997cd0011c34b9 100644
 --- a/index.html
 +++ b/index.html
 @@ -1,486 +1,674 @@
@@ -1132,6 +1129,101 @@ index 5da547108d413652ef42c6facf8e0921560d5e8a..e29c2ffbf8de787acf60e740f5997cd0
 +      root.render(<App />);
      </script>
 -    <script type="module" src="src/poster-app.js"></script>
+     <script>
+(() => {
+  // 这些 id 请与页面里的控件匹配；如不一致，把选择器改成你实际的 id/class。
+  const els = {
+    endpoint: document.querySelector('#glEndpoint'),     // 接口地址输入框
+    apiKey:   document.querySelector('#glKey'),          // API Key 输入框（可选）
+    prompt:   document.querySelector('#glPrompt'),       // “生成的提示词”文本域
+    btnConfirm: document.querySelector('#btnConfirm'),   // “确认”按钮
+    btnDesign:  document.querySelector('#btnDesign'),    // “提交到 Glibatree”按钮
+    status:   document.querySelector('#glStatus'),       // 状态文本 <div>
+    preview:  document.querySelector('#glPreview'),      // 结果图片 <img>
+    response: document.querySelector('#glResponse')      // 原始响应 <textarea>
+  };
+
+  // 兜底：若元素不存在，直接返回，避免报错
+  if (!els.endpoint || !els.prompt) return;
+
+  function setStatus(msg) {
+    if (els.status) els.status.textContent = msg;
+    console.log('[GLB]', msg);
+  }
+
+  function validate() {
+    const hasEndpoint = /^https?:\/\//i.test(els.endpoint.value.trim());
+    const hasPrompt   = (els.prompt.value.trim().length >= 8);
+    const hasKey      = (els.apiKey ? els.apiKey.value.trim().length > 0 : true);
+
+    if (els.btnConfirm) els.btnConfirm.disabled = !(hasEndpoint && hasPrompt);
+    if (els.btnDesign)  els.btnDesign.disabled  = !(hasEndpoint && hasPrompt && hasKey);
+  }
+
+  // 监听输入变化，动态启用按钮
+  ['input','change'].forEach(evt => {
+    [els.endpoint, els.apiKey, els.prompt].forEach(x => x && x.addEventListener(evt, validate));
+  });
+  validate();
+
+  // “确认”按钮：只是做一次校验并提示就绪
+  els.btnConfirm && els.btnConfirm.addEventListener('click', () => {
+    validate();
+    if (els.btnConfirm.disabled) return;
+    setStatus('✅ 已确认：提示词与接口就绪。可点击“提交到 Glibatree”。');
+  });
+
+  // “提交到 Glibatree”
+  els.btnDesign && els.btnDesign.addEventListener('click', async () => {
+    validate();
+    if (els.btnDesign.disabled) return;
+
+    const url   = els.endpoint.value.trim();
+    const key   = els.apiKey ? els.apiKey.value.trim() : '';
+    const prompt = els.prompt.value.trim();
+
+    setStatus('⏳ 正在提交…');
+    if (els.response) els.response.value = '';
+    if (els.preview)  els.preview.style.display = 'none';
+
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      // 兼容两种常见鉴权方式：Authorization 或 X-API-Key（按你们实际 API 调整）
+      if (key) {
+        headers['Authorization'] = `Bearer ${key}`;
+        headers['X-API-Key'] = key;
+      }
+
+      const res = await fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers,
+        body: JSON.stringify({ prompt })   // 如 API 需要别的字段（size, model…），在此补上
+      });
+
+      const text = await res.text();
+      if (els.response) els.response.value = text;
+
+      let data; try { data = JSON.parse(text); } catch {}
+      // 常见返回格式兜底：{image_url} 或 {url} 或 {data:[{url}]}
+      const imgUrl = data?.image_url || data?.url || data?.data?.[0]?.url;
+
+      if (!res.ok) {
+        setStatus(`❌ 失败：HTTP ${res.status}`);
+        return;
+      }
+      if (imgUrl && els.preview) {
+        els.preview.src = imgUrl;
+        els.preview.style.display = 'block';
+      }
+      setStatus('✅ 成功：已收到响应。');
+    } catch (e) {
+      // 典型 CORS 错误会走到这里：TypeError: Failed to fetch
+      setStatus('❌ 调用出错：' + (e?.message || e));
+    }
+  });
+})();
+</script>
    </body>
 -</html>
 +</html>
