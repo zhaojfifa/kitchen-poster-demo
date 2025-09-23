@@ -1,5 +1,4 @@
 // Source of truth for the poster editor. Copied directly to dist/app.js for browser use.
-const { useMemo, useRef, useState } = React;
 
 function uuid() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
@@ -29,6 +28,7 @@ function getInitials(name) {
   }
   return clean.slice(0, 2).toUpperCase();
 }
+
 
 const FEATURE_LAYOUT_MAP = {
   3: [
@@ -393,20 +393,14 @@ function AssetPreviewPanel({
   productImage,
   shots,
   features,
-}) {
-  const providedShotCount = shots.filter((shot) => Boolean(shot.img)).length;
+
 
   return React.createElement(
     "div",
     { className: "rounded-2xl border border-gray-200 bg-white p-5 shadow-sm" },
     React.createElement(
       "div",
-      { className: "flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between" },
-      React.createElement(StepBadge, { number: 1, label: "素材确认" }),
-      React.createElement(
-        "div",
-        { className: "text-xs text-gray-500" },
-        "确认左侧填写的图文素材，下一步将其一并提交给 Glibatree。",
+
       ),
     ),
     React.createElement(
@@ -620,6 +614,7 @@ function App() {
   const [designerResult, setDesignerResult] = useState(null);
   const [copyState, setCopyState] = useState("idle");
 
+
   const posterRef = useRef(null);
 
   const glibatreePrompt = useMemo(() => {
@@ -636,6 +631,7 @@ function App() {
     });
     const lines = [
       "使用 Glibatree Art Designer 绘制现代简洁风厨房电器宣传海报。",
+
       "画布尺寸 900x1400 像素，背景为浅灰或白色，整体主色为黑/红/灰银，留白充足、排版规整。",
       "版式结构：",
       "1. 顶部横条：左侧放品牌 Logo，右侧放代理名或分销名。",
@@ -680,6 +676,7 @@ function App() {
     return lines.join("\n");
   }, [
     agentName,
+
     brandLogo,
     brandName,
     features,
@@ -691,6 +688,7 @@ function App() {
     shots,
     tagline,
     taglineAlign,
+
   ]);
 
   const handleCopyPrompt = async () => {
@@ -719,6 +717,7 @@ function App() {
   };
 
   const callGlibatreeDesigner = async () => {
+
     if (!glibatreeEndpoint.trim()) {
       setDesignerStatus("error");
       setDesignerMessage("请填写 Glibatree Art Designer 接口地址。");
@@ -1321,27 +1320,7 @@ function App() {
             tagline,
             seriesDescription,
             productName,
-            scenarioImage,
-            productImage,
-            shots,
-            features,
-          }),
-          React.createElement(
-            "div",
-            { className: "rounded-2xl border border-gray-200 bg-white p-5 shadow-sm" },
-            React.createElement(
-              "div",
-              { className: "flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between" },
-              React.createElement(StepBadge, { number: 2, label: "调用 Glibatree" }),
-              React.createElement(
-                "span",
-                { className: "text-xs text-gray-500" },
-                "确认素材后，可直接调用 Glibatree Art Designer 生成新版设计。",
-              ),
-            ),
-            React.createElement(
-              "div",
-              { className: "mt-4 space-y-4" },
+
               React.createElement(
                 "div",
                 null,
@@ -1412,7 +1391,7 @@ function App() {
                   {
                     type: "button",
                     onClick: callGlibatreeDesigner,
-                    disabled: designerStatus === "loading",
+
                     className:
                       "inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white shadow hover:bg-[#b40018] disabled:cursor-not-allowed disabled:opacity-60",
                   },
