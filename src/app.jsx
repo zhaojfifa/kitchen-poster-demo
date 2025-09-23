@@ -1,5 +1,4 @@
 // Source of truth for the poster editor. Copied directly to dist/app.js for browser use.
-const { useMemo, useRef, useState, useEffect, useCallback } = React;
 
 function uuid() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
@@ -30,22 +29,6 @@ function getInitials(name) {
   return clean.slice(0, 2).toUpperCase();
 }
 
-function fingerprintImage(dataUrl) {
-  if (!dataUrl) return "";
-  const start = dataUrl.slice(0, 32);
-  const end = dataUrl.slice(-32);
-  return `${dataUrl.length}:${start}:${end}`;
-}
-
-function formatDateTime(timestamp) {
-  if (!timestamp) return "";
-  try {
-    return new Date(timestamp).toLocaleString("zh-CN", { hour12: false });
-  } catch (error) {
-    console.error("格式化时间失败", error);
-    return "";
-  }
-}
 
 const FEATURE_LAYOUT_MAP = {
   3: [
@@ -410,79 +393,14 @@ function AssetPreviewPanel({
   productImage,
   shots,
   features,
-  confirmationStatus,
-  confirmedAt,
-  onConfirm,
-  canConfirm,
-}) {
-  const providedShotCount = shots.filter((shot) => Boolean(shot.img)).length;
-  const statusMeta = {
-    "needs-review": {
-      chipClass: "border-amber-300 bg-amber-50 text-amber-700",
-      label: "待确认",
-      message: "确认左侧填写的图文素材，下一步将其一并提交给 Glibatree。",
-    },
-    dirty: {
-      chipClass: "border-orange-300 bg-orange-50 text-orange-700",
-      label: "需重新确认",
-      message: "素材已更新，请重新确认后再调用 Glibatree。",
-    },
-    confirmed: {
-      chipClass: "border-emerald-300 bg-emerald-50 text-emerald-700",
-      label: "已确认",
-      message: "素材已确认，可继续调用 Glibatree。",
-    },
-  };
-  const status = statusMeta[confirmationStatus] || statusMeta["needs-review"];
-  const confirmButtonLabel =
-    confirmationStatus === "confirmed"
-      ? canConfirm
-        ? "重新确认素材"
-        : "已确认"
-      : "确认素材无误";
-  const confirmButtonClass = canConfirm
-    ? "inline-flex items-center justify-center rounded-lg border border-gray-900 px-3 py-1.5 text-xs font-semibold text-gray-900 transition hover:bg-gray-900 hover:text-white"
-    : "inline-flex items-center justify-center rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-400 transition cursor-not-allowed";
+
 
   return React.createElement(
     "div",
     { className: "rounded-2xl border border-gray-200 bg-white p-5 shadow-sm" },
     React.createElement(
       "div",
-      { className: "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" },
-      React.createElement(
-        "div",
-        { className: "flex flex-wrap items-center gap-3" },
-        React.createElement(StepBadge, { number: 1, label: "素材确认" }),
-        React.createElement(
-          "span",
-          {
-            className: `inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold ${status.chipClass}`,
-          },
-          status.label,
-        ),
-        confirmedAt
-          ? React.createElement(
-              "span",
-              { className: "text-[11px] text-gray-400" },
-              `上次确认：${formatDateTime(confirmedAt)}`,
-            )
-          : null,
-      ),
-      React.createElement(
-        "div",
-        { className: "flex flex-col items-start gap-2 text-xs text-gray-500 sm:items-end sm:text-right" },
-        React.createElement("span", null, status.message),
-        React.createElement(
-          "button",
-          {
-            type: "button",
-            onClick: onConfirm,
-            disabled: !canConfirm,
-            className: confirmButtonClass,
-          },
-          confirmButtonLabel,
-        ),
+
       ),
     ),
     React.createElement(
@@ -696,72 +614,6 @@ function App() {
   const [designerResult, setDesignerResult] = useState(null);
   const [copyState, setCopyState] = useState("idle");
 
-  const assetSignature = useMemo(
-    () =>
-      JSON.stringify({
-        brandName,
-        brandLogo: fingerprintImage(brandLogo),
-        agentName,
-        headline,
-        tagline,
-        taglineAlign,
-        scenarioImage: fingerprintImage(scenarioImage),
-        productName,
-        productImage: fingerprintImage(productImage),
-        seriesDescription,
-        features: features.map((feature) => ({ id: feature.id, text: feature.text })),
-        shots: shots.map((shot) => ({ id: shot.id, label: shot.label, fingerprint: fingerprintImage(shot.img) })),
-      }),
-    [
-      agentName,
-      brandLogo,
-      brandName,
-      features,
-      headline,
-      productImage,
-      productName,
-      scenarioImage,
-      seriesDescription,
-      shots,
-      tagline,
-      taglineAlign,
-    ],
-  );
-
-  const [assetConfirmation, setAssetConfirmation] = useState({
-    status: "needs-review",
-    signature: "",
-    confirmedAt: null,
-  });
-
-  const isAssetsConfirmed =
-    assetConfirmation.status === "confirmed" && assetConfirmation.signature === assetSignature;
-  const canConfirmAssets =
-    assetConfirmation.status !== "confirmed" || assetConfirmation.signature !== assetSignature;
-
-  useEffect(() => {
-    setAssetConfirmation((prev) => {
-      if (prev.status === "confirmed" && prev.signature !== assetSignature) {
-        return { ...prev, status: "dirty" };
-      }
-      return prev;
-    });
-  }, [assetSignature]);
-
-  useEffect(() => {
-    if (assetConfirmation.status === "dirty" && designerStatus !== "loading") {
-      const message = "素材内容有更新，请重新确认后再调用 Glibatree。";
-      setDesignerMessage((prev) => (prev === message ? prev : message));
-      if (designerStatus !== "idle") {
-        setDesignerStatus("idle");
-      }
-      setDesignerResult(null);
-    }
-  }, [assetConfirmation.status, designerStatus]);
-
-  const confirmAssets = useCallback(() => {
-    setAssetConfirmation({ status: "confirmed", signature: assetSignature, confirmedAt: Date.now() });
-  }, [assetSignature]);
 
   const posterRef = useRef(null);
 
@@ -779,9 +631,7 @@ function App() {
     });
     const lines = [
       "使用 Glibatree Art Designer 绘制现代简洁风厨房电器宣传海报。",
-      isAssetsConfirmed
-        ? "以下素材已由品牌方确认无误，请严格按照对应内容进行排版与设计。"
-        : "素材仍在完善中，请以最新文本说明为准，保持整体风格一致。",
+
       "画布尺寸 900x1400 像素，背景为浅灰或白色，整体主色为黑/红/灰银，留白充足、排版规整。",
       "版式结构：",
       "1. 顶部横条：左侧放品牌 Logo，右侧放代理名或分销名。",
@@ -826,8 +676,7 @@ function App() {
     return lines.join("\n");
   }, [
     agentName,
-    assetSignature,
-    assetConfirmation.status,
+
     brandLogo,
     brandName,
     features,
@@ -839,7 +688,7 @@ function App() {
     shots,
     tagline,
     taglineAlign,
-    isAssetsConfirmed,
+
   ]);
 
   const handleCopyPrompt = async () => {
@@ -868,12 +717,7 @@ function App() {
   };
 
   const callGlibatreeDesigner = async () => {
-    if (!isAssetsConfirmed) {
-      setDesignerStatus("error");
-      setDesignerMessage("请先在“素材确认”中点击“确认素材无误”，并确保素材未再次改动。");
-      setDesignerResult(null);
-      return;
-    }
+
     if (!glibatreeEndpoint.trim()) {
       setDesignerStatus("error");
       setDesignerMessage("请填写 Glibatree Art Designer 接口地址。");
@@ -1476,33 +1320,7 @@ function App() {
             tagline,
             seriesDescription,
             productName,
-          scenarioImage,
-          productImage,
-          shots,
-          features,
-          confirmationStatus: assetConfirmation.status,
-          confirmedAt: assetConfirmation.confirmedAt,
-          onConfirm: confirmAssets,
-          canConfirm: canConfirmAssets,
-        }),
-        React.createElement(
-          "div",
-          { className: "rounded-2xl border border-gray-200 bg-white p-5 shadow-sm" },
-          React.createElement(
-            "div",
-            { className: "flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between" },
-            React.createElement(StepBadge, { number: 2, label: "调用 Glibatree" }),
-            React.createElement(
-              "span",
-              { className: `text-xs ${isAssetsConfirmed ? "text-gray-500" : "text-amber-600"}` },
-              isAssetsConfirmed
-                ? "素材已确认，可直接调用 Glibatree Art Designer 生成新版设计。"
-                : "请先完成上方“素材确认”，再调用 Glibatree 生成新版设计。",
-            ),
-          ),
-          React.createElement(
-            "div",
-            { className: "mt-4 space-y-4" },
+
               React.createElement(
                 "div",
                 null,
@@ -1573,7 +1391,7 @@ function App() {
                   {
                     type: "button",
                     onClick: callGlibatreeDesigner,
-                    disabled: designerStatus === "loading" || !isAssetsConfirmed,
+
                     className:
                       "inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white shadow hover:bg-[#b40018] disabled:cursor-not-allowed disabled:opacity-60",
                   },
